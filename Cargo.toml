@@ -1,0 +1,11 @@
+[package]
+name = "filters"
+version = "0.1.0"
+authors = ["Matthias Beyer <mail@beyermatthias.de>"]
+
+description = "Build filters/predicates with the builder pattern"
+keywords = ["iterator", "filter", "builder", "util"]
+readme        = "./README.md"
+license       = "LGPL-2.1"
+
+[dependencies]
