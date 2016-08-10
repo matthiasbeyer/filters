@@ -1,21 +1,23 @@
 use filter::Filter;
 
-pub struct And<T> {
-    a: Box<Filter<T>>,
-    b: Box<Filter<T>>
+#[must_use = "filters are lazy and do nothing unless consumed"]
+#[derive(Clone)]
+pub struct And<T, U> {
+    a: T,
+    b: U
 }
 
-impl<T> And<T> {
+impl<T, U> And<T, U> {
 
-    pub fn new(a: Box<Filter<T>>, b: Box<Filter<T>>) -> And<T> {
+    pub fn new(a: T, b: U) -> And<T, U> {
         And { a: a, b: b }
     }
 
 }
 
-impl<T> Filter<T> for And<T> {
+impl<I, T: Filter<I>, U: Filter<I>> Filter<I> for And<T, U> {
 
-    fn filter(&self, e: &T) -> bool {
+    fn filter(&self, e: &I) -> bool {
         self.a.filter(e) && self.b.filter(e)
     }
 
