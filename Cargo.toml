@@ -8,4 +8,7 @@ keywords = ["iterator", "filter", "builder", "util"]
 readme        = "./README.md"
 license       = "LGPL-2.1"
 
+documentation = "https://matthiasbeyer.github.io/filters/filters/index.html"
+repository = "https://github.com/matthiasbeyer/filters"
+
 [dependencies]
