@@ -167,4 +167,14 @@ mod test {
         assert_eq!(aeq.filter(&17), false);
     }
 
+    #[test]
+    fn filter_iterator() {
+        let v = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
+        let inrange        = (|&a: &usize| { a > 5 }).and(|&a: &usize| { a < 15 });
+
+        let r : Vec<usize> = v.into_iter().filter(|x| inrange.filter(x)).collect();
+
+        assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    }
 }
