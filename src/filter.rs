@@ -139,6 +139,19 @@ pub trait Filter<N> {
         self.and(Not::new(other.into_filter()))
     }
 
+    /// Helper to connect two filters via logical NAND
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.nand(b) == (|&a: &usize| { !(a == 1 && a == 2) })
+    /// ```
+    fn nand<F>(self, other: F) -> Not<And<Self, F>>
+        where Self: Sized,
+    {
+        Not::new(And::new(self, other))
+    }
 
 }
 
