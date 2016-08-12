@@ -1,3 +1,8 @@
+//! OR implementation.
+//!
+//! Will be automatically included when incluing `filter::Filter`, so importing this module
+//! shouldn't be necessary.
+//!
 use filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
