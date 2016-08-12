@@ -1,6 +1,26 @@
 # filters
 
-_to be written_
+A library crate to build predicates and filter.
+
+[The docs are on github pages](https://matthiasbeyer.github.io/filters/).
+[![Build Status](https://travis-ci.org/matthiasbeyer/filters.svg?branch=master)](https://travis-ci.org/matthiasbeyer/filters)
+
+Examples explain it best:
+
+```rust
+use filters::filter::Filter;
+
+let not_eq_to_one   = |&a: &usize| { a != 1 };
+let not_eq_to_two   = |&a: &usize| { a != 2 };
+let not_eq_to_three = |&a: &usize| { a != 3 };
+
+let a = not_eq_to_one.and(not_eq_to_two).and(not_eq_to_three);
+// We now have ((a > 5) && !(a < 20)) || a == 10
+
+assert_eq!(a.filter(&21), true);
+```
+
+For more examples have a look at the tests in `./src/filters.rs`.
 
 # License
 
