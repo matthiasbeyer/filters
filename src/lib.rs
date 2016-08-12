@@ -64,7 +64,8 @@
 //! let r : Vec<usize> = v.into_iter().filter(|x| inrange.filter(x)).collect();
 //! assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
 //! ```
-//!
+
+#![doc(html_root_url = "https://matthiasbeyer.github.io/filters/")]
 
 pub mod filter;
 pub mod ops;
