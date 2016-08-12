@@ -3,6 +3,7 @@
 
 pub use ops::and::And;
 pub use ops::not::Not;
+pub use ops::xor::XOr;
 pub use ops::or::Or;
 
 /// Trait for converting something into a Filter
@@ -104,6 +105,20 @@ pub trait Filter<N> {
         where Self: Sized,
     {
         Not::new(Or::new(self, other))
+    }
+
+    /// Helper to connect two filters via logical XOR
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.xor(b) == (|&a: &usize| { !(a == 1 || a == 2) })
+    /// ```
+    fn xor<F>(self, other: F) -> XOr<Self, F>
+        where Self: Sized,
+    {
+        XOr::new(self, other)
     }
 
     /// Helper to connect two filters via logical AND
