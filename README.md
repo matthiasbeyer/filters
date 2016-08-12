@@ -15,7 +15,6 @@ let not_eq_to_two   = |&a: &usize| { a != 2 };
 let not_eq_to_three = |&a: &usize| { a != 3 };
 
 let a = not_eq_to_one.and(not_eq_to_two).and(not_eq_to_three);
-// We now have ((a > 5) && !(a < 20)) || a == 10
 
 assert_eq!(a.filter(&21), true);
 ```
