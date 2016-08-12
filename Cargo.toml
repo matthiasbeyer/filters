@@ -1,7 +1,8 @@
 [package]
 name = "filters"
 version = "0.1.0"
-authors = ["Matthias Beyer <mail@beyermatthias.de>"]
+authors = ["Matthias Beyer <mail@beyermatthias.de>",
+           "Marcel Müller <neikos@neikos.email>" ]
 
 description = "Build filters/predicates with the builder pattern"
 keywords = ["iterator", "filter", "builder", "util"]
