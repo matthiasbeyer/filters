@@ -207,6 +207,15 @@ mod test {
     }
 
     #[test]
+    fn xor_filter() {
+        let a = (|&a: &usize| a == 0).xor(|&a: &usize| a == 3);
+
+        assert_eq!(a.filter(&3), true);
+        assert_eq!(a.filter(&5), false);
+        assert_eq!(a.filter(&0), true);
+    }
+
+    #[test]
     fn complex_filter() {
         let a = (|&a: &usize|{ a > 5 }).and_not(|&a: &usize| a < 20).or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20) ) || a == 10
