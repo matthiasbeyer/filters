@@ -92,6 +92,20 @@ pub trait Filter<N> {
         Or::new(self, Or::new(other.into_filter(), other2.into_filter()))
     }
 
+    /// Helper to connect two filters via logical NOR
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.nor(b) == (|&a: &usize| { !(a == 1 || a == 2) })
+    /// ```
+    fn nor<F>(self, other: F) -> Not<Or<Self, F>>
+        where Self: Sized,
+    {
+        Not::new(Or::new(self, other))
+    }
+
     /// Helper to connect two filters via logical AND
     ///
     /// ```ignore
