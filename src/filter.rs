@@ -1,13 +1,18 @@
+//! The filter implementation
+//!
+
 pub use ops::and::And;
 pub use ops::not::Not;
 pub use ops::or::Or;
 
+/// Trait for converting something into a Filter
 pub trait IntoFilter<N> {
     type IntoFilt: Filter<N>;
 
     fn into_filter(self) -> Self::IntoFilt;
 }
 
+/// All Filters can be turned into Filters
 impl<N, I: Filter<N>> IntoFilter<N> for I {
     type IntoFilt = I;
 
@@ -16,22 +21,38 @@ impl<N, I: Filter<N>> IntoFilter<N> for I {
     }
 }
 
+/// All closures that take a ref to something and return bool are filters
 impl<I, T: Fn(&I) -> bool> Filter<I> for T {
     fn filter(&self, other: &I) -> bool {
         self(other)
     }
 }
 
+/// The filter trai
 pub trait Filter<N> {
 
+    /// The function which is used to filter something
     fn filter(&self, &N) -> bool;
 
+    /// Helper to invert a filter.
+    ///
+    /// ```ignore
+    /// (|&a: &usize| { a == 1 }).not() == (|&a: &usize| { a != 1 })
+    /// ```
     fn not(self) -> Not<Self>
         where Self: Sized
     {
         Not::new(self)
     }
 
+    /// Helper to connect two filters via logical OR
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.or(b) == (|&a: &usize| { a == 1 || a == 2 })
+    /// ```
     fn or<F>(self, other: F) -> Or<Self, F::IntoFilt>
         where Self: Sized,
               F: IntoFilter<N> + Sized
@@ -39,6 +60,14 @@ pub trait Filter<N> {
         Or::new(self, other.into_filter())
     }
 
+    /// Helper to connect two filters via logical OR and NOT
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.or_not(b) == (|&a: &usize| { a == 1 || !(a == 2) })
+    /// ```
     fn or_not<F>(self, other: F) -> Or<Self, Not<F::IntoFilt>>
         where Self: Sized,
               F: IntoFilter<N> + Sized,
@@ -46,6 +75,15 @@ pub trait Filter<N> {
         self.or(Not::new(other.into_filter()))
     }
 
+    /// Helper to connect three filters via logical OR
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    /// let c = (|&a: &usize| { a == 3 });
+    ///
+    /// a.or3(b, c) == (|&a: &usize| { a == 1 || a == 2 || a == 3 })
+    /// ```
     fn or3<F, F2>(self, other: F, other2: F2) -> Or<Self, Or<F::IntoFilt, F2::IntoFilt>>
         where Self: Sized,
               F: IntoFilter<N> + Sized,
@@ -54,6 +92,14 @@ pub trait Filter<N> {
         Or::new(self, Or::new(other.into_filter(), other2.into_filter()))
     }
 
+    /// Helper to connect two filters via logical AND
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.and(b) == (|&a: &usize| { a == 1 && a == 2 })
+    /// ```
     fn and<F>(self, other: F) -> And<Self, F::IntoFilt>
         where Self: Sized,
               F: IntoFilter<N> + Sized
@@ -61,6 +107,15 @@ pub trait Filter<N> {
         And::new(self, other.into_filter())
     }
 
+    /// Helper to connect three filters via logical AND
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    /// let c = (|&a: &usize| { a == 3 });
+    ///
+    /// a.and3(b, c) == (|&a: &usize| { a == 1 && a == 2 && a == 3 })
+    /// ```
     fn and3<F, F2>(self, other: F, other2: F2) -> And<Self, And<F::IntoFilt, F2::IntoFilt>>
         where Self: Sized,
               F: IntoFilter<N> + Sized,
@@ -69,6 +124,14 @@ pub trait Filter<N> {
         And::new(self, And::new(other.into_filter(), other2.into_filter()))
     }
 
+    /// Helper to connect two filters via logical AND and NOT
+    ///
+    /// ```ignore
+    /// let a = (|&a: &usize| { a == 1 });
+    /// let b = (|&a: &usize| { a == 2 });
+    ///
+    /// a.and_not(b) == (|&a: &usize| { a == 1 && !(a == 2) })
+    /// ```
     fn and_not<F>(self, other: F) -> And<Self, Not<F::IntoFilt>>
         where Self: Sized,
               F: IntoFilter<N> + Sized
