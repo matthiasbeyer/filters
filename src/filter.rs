@@ -2,6 +2,7 @@
 //!
 
 pub use ops::and::And;
+pub use ops::bool::Bool;
 pub use ops::not::Not;
 pub use ops::xor::XOr;
 pub use ops::or::Or;
@@ -189,6 +190,7 @@ pub trait Filter<N> {
 mod test {
     use filter::Filter;
     use ops::and::And;
+    use ops::bool::Bool;
 
     #[test]
     fn closures() {
@@ -250,6 +252,21 @@ mod test {
         assert_eq!(a.filter(&10), true);
         assert_eq!(a.filter(&1), false);
         assert_eq!(a.filter(&3), false);
+    }
+
+    #[test]
+    fn filter_with_bool() {
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.and(Bool::new(true)).filter(&0), false);
+
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.and(Bool::new(true)).filter(&1), true);
+
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.or(Bool::new(true)).filter(&17), true);
+
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.or(Bool::new(true)).filter(&42), true);
     }
 
     struct EqTo {
