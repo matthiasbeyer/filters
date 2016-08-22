@@ -38,8 +38,12 @@ pub trait Filter<N> {
 
     /// Helper to invert a filter.
     ///
-    /// ```ignore
-    /// (|&a: &usize| { a == 1 }).not() == (|&a: &usize| { a != 1 })
+    /// ```
+    /// use filters::filter::Filter;
+    ///
+    /// let f = (|&a: &usize| { a == 1 }).not();
+    ///
+    /// assert!(f.filter(&2));
     /// ```
     fn not(self) -> Not<Self>
         where Self: Sized
@@ -49,11 +53,16 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical OR
     ///
-    /// ```ignore
+    /// ```
+    /// use filters::filter::Filter;
+    ///
     /// let a = (|&a: &usize| { a == 1 });
     /// let b = (|&a: &usize| { a == 2 });
+    /// let c = a.or(b);
     ///
-    /// a.or(b) == (|&a: &usize| { a == 1 || a == 2 })
+    /// assert!(c.filter(&1));
+    /// assert!(c.filter(&2));
+    /// assert!(!c.filter(&7));
     /// ```
     fn or<F>(self, other: F) -> Or<Self, F::IntoFilt>
         where Self: Sized,
@@ -64,11 +73,16 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical OR and NOT
     ///
-    /// ```ignore
+    /// ```
+    /// use filters::filter::Filter;
+    ///
     /// let a = (|&a: &usize| { a == 1 });
     /// let b = (|&a: &usize| { a == 2 });
+    /// let c = a.or_not(b);
     ///
-    /// a.or_not(b) == (|&a: &usize| { a == 1 || !(a == 2) })
+    /// assert!(c.filter(&1));
+    /// assert!(!c.filter(&2));
+    /// assert!(c.filter(&7));
     /// ```
     fn or_not<F>(self, other: F) -> Or<Self, Not<F::IntoFilt>>
         where Self: Sized,
@@ -79,12 +93,18 @@ pub trait Filter<N> {
 
     /// Helper to connect three filters via logical OR
     ///
-    /// ```ignore
+    /// ```
+    /// use filters::filter::Filter;
+    ///
     /// let a = (|&a: &usize| { a == 1 });
     /// let b = (|&a: &usize| { a == 2 });
     /// let c = (|&a: &usize| { a == 3 });
+    /// let d = a.or3(b, c);
     ///
-    /// a.or3(b, c) == (|&a: &usize| { a == 1 || a == 2 || a == 3 })
+    /// assert!(d.filter(&1));
+    /// assert!(d.filter(&2));
+    /// assert!(d.filter(&3));
+    /// assert!(!d.filter(&4));
     /// ```
     fn or3<F, F2>(self, other: F, other2: F2) -> Or<Self, Or<F::IntoFilt, F2::IntoFilt>>
         where Self: Sized,
@@ -96,11 +116,17 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical NOR
     ///
-    /// ```ignore
+    /// ```
+    /// use filters::filter::Filter;
+    ///
     /// let a = (|&a: &usize| { a == 1 });
     /// let b = (|&a: &usize| { a == 2 });
+    /// let c = a.nor(b); /* !(a == 1 || a == 2) */
     ///
-    /// a.nor(b) == (|&a: &usize| { !(a == 1 || a == 2) })
+    /// assert!(!c.filter(&1));
+    /// assert!(!c.filter(&2));
+    /// assert!(c.filter(&3));
+    /// assert!(c.filter(&4));
     /// ```
     fn nor<F>(self, other: F) -> Not<Or<Self, F>>
         where Self: Sized,
@@ -110,11 +136,18 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical XOR
     ///
-    /// ```ignore
-    /// let a = (|&a: &usize| { a == 1 });
-    /// let b = (|&a: &usize| { a == 2 });
+    /// ```
+    /// use filters::filter::Filter;
     ///
-    /// a.xor(b) == (|&a: &usize| { !(a == 1 || a == 2) })
+    /// let a = (|&a: &usize| { a > 3 });
+    /// let b = (|&a: &usize| { a < 7 });
+    /// let c = a.xor(b);
+    ///
+    /// assert!(c.filter(&1));
+    /// assert!(c.filter(&3));
+    /// assert!(!c.filter(&4));
+    /// assert!(!c.filter(&6));
+    /// assert!(c.filter(&9));
     /// ```
     fn xor<F>(self, other: F) -> XOr<Self, F>
         where Self: Sized,
@@ -124,11 +157,18 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical AND
     ///
-    /// ```ignore
-    /// let a = (|&a: &usize| { a == 1 });
-    /// let b = (|&a: &usize| { a == 2 });
+    /// ```
+    /// use filters::filter::Filter;
     ///
-    /// a.and(b) == (|&a: &usize| { a == 1 && a == 2 })
+    /// let a = (|&a: &usize| { a > 1 });
+    /// let b = (|&a: &usize| { a < 7 });
+    /// let c = a.and(b);
+    ///
+    /// assert!(!c.filter(&1));
+    /// assert!(c.filter(&3));
+    /// assert!(c.filter(&4));
+    /// assert!(c.filter(&6));
+    /// assert!(!c.filter(&9));
     /// ```
     fn and<F>(self, other: F) -> And<Self, F::IntoFilt>
         where Self: Sized,
@@ -139,12 +179,21 @@ pub trait Filter<N> {
 
     /// Helper to connect three filters via logical AND
     ///
-    /// ```ignore
-    /// let a = (|&a: &usize| { a == 1 });
-    /// let b = (|&a: &usize| { a == 2 });
-    /// let c = (|&a: &usize| { a == 3 });
+    /// ```
+    /// use filters::filter::Filter;
     ///
-    /// a.and3(b, c) == (|&a: &usize| { a == 1 && a == 2 && a == 3 })
+    /// let a = (|&a: &usize| { a > 1 });
+    /// let b = (|&a: &usize| { a < 20 });
+    /// let c = (|&a: &usize| { a % 2 == 0 });
+    /// let d = a.and3(b, c);
+    ///
+    /// assert!(!d.filter(&1));
+    /// assert!(!d.filter(&3));
+    /// assert!(d.filter(&8));
+    /// assert!(d.filter(&10));
+    /// assert!(d.filter(&14));
+    /// assert!(!d.filter(&15));
+    /// assert!(!d.filter(&19));
     /// ```
     fn and3<F, F2>(self, other: F, other2: F2) -> And<Self, And<F::IntoFilt, F2::IntoFilt>>
         where Self: Sized,
@@ -156,11 +205,20 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical AND and NOT
     ///
-    /// ```ignore
-    /// let a = (|&a: &usize| { a == 1 });
-    /// let b = (|&a: &usize| { a == 2 });
+    /// ```
+    /// use filters::filter::Filter;
     ///
-    /// a.and_not(b) == (|&a: &usize| { a == 1 && !(a == 2) })
+    /// let a = (|&a: &usize| { a > 10 });
+    /// let b = (|&a: &usize| { a < 20 });
+    /// let c = a.and_not(b);
+    ///
+    /// assert!(!c.filter(&1));
+    /// assert!(!c.filter(&3));
+    /// assert!(!c.filter(&8));
+    /// assert!(!c.filter(&11));
+    /// assert!(c.filter(&24));
+    /// assert!(c.filter(&25));
+    /// assert!(c.filter(&29));
     /// ```
     fn and_not<F>(self, other: F) -> And<Self, Not<F::IntoFilt>>
         where Self: Sized,
@@ -171,11 +229,20 @@ pub trait Filter<N> {
 
     /// Helper to connect two filters via logical NAND
     ///
-    /// ```ignore
-    /// let a = (|&a: &usize| { a == 1 });
-    /// let b = (|&a: &usize| { a == 2 });
+    /// ```
+    /// use filters::filter::Filter;
     ///
-    /// a.nand(b) == (|&a: &usize| { !(a == 1 && a == 2) })
+    /// let a = (|&a: &usize| { a > 10 });
+    /// let b = (|&a: &usize| { a < 20 });
+    /// let c = a.nand(b);
+    ///
+    /// assert!(c.filter(&1));
+    /// assert!(c.filter(&3));
+    /// assert!(c.filter(&8));
+    /// assert!(!c.filter(&11));
+    /// assert!(!c.filter(&14));
+    /// assert!(c.filter(&25));
+    /// assert!(c.filter(&29));
     /// ```
     fn nand<F>(self, other: F) -> Not<And<Self, F>>
         where Self: Sized,
