@@ -20,10 +20,4 @@ impl<T, U> XOr<T, U> {
 
 }
 
-impl<I, T: Filter<I>, U: Filter<I>> Filter<I> for XOr<T, U> {
-
-    fn filter(&self, e: &I) -> bool {
-        self.a.filter(e) ^ self.b.filter(e)
-    }
-
-}
+impl_operators!(XOr, self e { self.a.filter(e) ^ self.b.filter(e) }, T, U);

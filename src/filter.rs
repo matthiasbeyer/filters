@@ -263,7 +263,9 @@ mod test {
     fn closures() {
         let a = (|&a: &usize|{ a < 3 }).and(|&a: &usize| a > 1);
 
+        assert_eq!(a.filter(&0), false);
         assert_eq!(a.filter(&2), true);
+        assert_eq!(a.filter(&3), false);
     }
 
     #[test]
@@ -330,7 +332,7 @@ mod test {
         assert_eq!(eq.and(Bool::new(true)).filter(&1), true);
 
         let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.or(Bool::new(true)).filter(&17), true);
+        assert_eq!(eq.xor(Bool::new(true)).filter(&1), false);
 
         let eq = |&a: &usize| { a == 1 };
         assert_eq!(eq.or(Bool::new(true)).filter(&42), true);
@@ -376,3 +378,65 @@ mod test {
         assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
     }
 }
+
+
+#[cfg(test)]
+#[cfg(feature = "unstable-filter-as-fn")]
+mod test_unstable {
+    use filter::Filter;
+    use ops::bool::Bool;
+
+    #[test]
+    fn closures() {
+        let a = (|&a: &usize|{ a < 3 }).and(|&a: &usize| a > 1);
+
+        assert_eq!(a(&0), false);
+        assert_eq!(a(&2), true);
+        assert_eq!(a(&3), false);
+    }
+
+    #[test]
+    fn xor_filter() {
+        let a = (|&a: &usize| a == 0).xor(|&a: &usize| a == 3);
+
+        assert_eq!(a(&3), true);
+        assert_eq!(a(&5), false);
+        assert_eq!(a(&0), true);
+    }
+
+    #[test]
+    fn complex_filter() {
+        let a = (|&a: &usize|{ a > 5 }).and_not(|&a: &usize| a < 20).or(|&a: &usize| a == 10);
+        // We now have ((a > 5) && !(a < 20) ) || a == 10
+
+        assert_eq!(a(&21), true);
+        assert_eq!(a(&11), false);
+    }
+
+    #[test]
+    fn filter_with_bool() {
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.and(Bool::new(true))(&0), false);
+
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.and(Bool::new(true))(&1), true);
+
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.xor(Bool::new(true))(&1), false);
+
+        let eq = |&a: &usize| { a == 1 };
+        assert_eq!(eq.or(Bool::new(true))(&42), true);
+    }
+
+    #[test]
+    fn filter_iterator() {
+        let v = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
+        let inrange        = (|&a: &usize| { a > 5 }).and(|&a: &usize| { a < 15 });
+
+        let r : Vec<usize> = v.into_iter().filter(inrange).collect();
+
+        assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    }
+}
+
