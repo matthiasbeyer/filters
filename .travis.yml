@@ -3,9 +3,13 @@ rust:
 - stable
 - beta
 - nightly
-matrix:
-  allow_failures:
-  - rust: nightly
+script: |
+  cargo build --verbose &&
+  if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then
+    cargo test --verbose --features unstable-filter-as-fn
+  else
+    cargo test --verbose
+  fi
 after_success: |
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&

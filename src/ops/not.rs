@@ -19,10 +19,4 @@ impl<T> Not<T> {
 
 }
 
-impl<I, T: Filter<I>> Filter<I> for Not<T> {
-
-    fn filter(&self, e: &I) -> bool {
-        !self.a.filter(e)
-    }
-
-}
+impl_operators!(Not, self e { !self.a.filter(e) }, T);

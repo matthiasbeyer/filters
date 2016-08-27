@@ -19,14 +19,6 @@ impl Bool {
 
 }
 
-impl<I> Filter<I> for Bool {
-
-    fn filter(&self, _: &I) -> bool {
-        self.b
-    }
-
-}
-
 impl From<bool> for Bool {
 
     fn from(b: bool) -> Bool {
@@ -35,3 +27,4 @@ impl From<bool> for Bool {
 
 }
 
+impl_operators!(Bool, self e { self.b }, );
