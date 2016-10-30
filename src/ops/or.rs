@@ -13,17 +13,14 @@ use filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct Or<T, U> {
-    a: T,
-    b: U
-}
+pub struct Or<T, U>(T, U);
 
 impl<T, U> Or<T, U> {
 
     pub fn new(a: T, b: U) -> Or<T, U> {
-        Or { a: a, b: b }
+        Or(a, b)
     }
 
 }
 
-impl_operators!(Or, self e { self.a.filter(e) || self.b.filter(e) }, T, U);
+impl_operators!(Or, self e { self.0.filter(e) || self.1.filter(e) }, T, U);

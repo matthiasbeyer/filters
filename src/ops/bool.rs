@@ -13,14 +13,12 @@ use filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct Bool {
-    b: bool
-}
+pub struct Bool(bool);
 
 impl Bool {
 
     pub fn new(b: bool) -> Bool {
-        Bool { b: b }
+        Bool(b)
     }
 
 }
@@ -33,4 +31,4 @@ impl From<bool> for Bool {
 
 }
 
-impl_operators!(Bool, self e { self.b }, );
+impl_operators!(Bool, self e { self.0 }, );

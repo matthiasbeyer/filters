@@ -13,17 +13,14 @@ use filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct XOr<T, U> {
-    a: T,
-    b: U
-}
+pub struct XOr<T, U>(T, U);
 
 impl<T, U> XOr<T, U> {
 
     pub fn new(a: T, b: U) -> XOr<T, U> {
-        XOr { a: a, b: b }
+        XOr(a, b)
     }
 
 }
 
-impl_operators!(XOr, self e { self.a.filter(e) ^ self.b.filter(e) }, T, U);
+impl_operators!(XOr, self e { self.0.filter(e) ^ self.1.filter(e) }, T, U);
