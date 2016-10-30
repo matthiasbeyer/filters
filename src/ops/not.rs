@@ -13,16 +13,14 @@ use filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct Not<T> {
-    a: T
-}
+pub struct Not<T>(T);
 
 impl<T> Not<T> {
 
     pub fn new(a: T) -> Not<T> {
-        Not { a: a }
+        Not(a)
     }
 
 }
 
-impl_operators!(Not, self e { !self.a.filter(e) }, T);
+impl_operators!(Not, self e { !self.0.filter(e) }, T);
