@@ -75,6 +75,7 @@
 #![cfg_attr(feature = "unstable-filter-as-fn", feature(unboxed_closures, fn_traits))]
 
 pub mod filter;
+pub mod failable;
 #[macro_use]
 pub mod impl_traits;
 pub mod ops;
