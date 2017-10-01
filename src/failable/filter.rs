@@ -410,5 +410,36 @@ mod tests {
 
         assert!(a.filter(&1).unwrap());
     }
+
+    #[test]
+    fn test_error_return() {
+        let a = |_: &i32| -> Result<bool, StupError> { Err(StupError {}) };
+
+        assert!(a.filter(&1).is_err());
+    }
+
+    #[test]
+    fn test_error_return_and_chained() {
+        let a = |_: &i32| -> Result<bool, StupError> { Err(StupError {}) };
+        let b = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let c = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let d = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+
+        let e = d.and(b).and(c).and(a);
+
+        assert!(e.filter(&1).is_err());
+    }
+
+    #[test]
+    fn test_error_return_or_chained() {
+        let a = |_: &i32| -> Result<bool, StupError> { Err(StupError {}) };
+        let b = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let c = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let d = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+
+        let e = a.or(b).or(c).or(d);
+
+        assert!(e.filter(&1).is_err());
+    }
 }
 
