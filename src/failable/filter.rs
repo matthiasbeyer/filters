@@ -248,3 +248,10 @@ pub trait FailableFilter<N, E: Error> {
 
 }
 
+/// All closures that take a ref to something and return Result<bool, E> are failable filters
+impl<I, E: Error, T: Fn(&I) -> Result<bool, E>> FailableFilter<I, E> for T {
+    fn filter(&self, other: &I) -> Result<bool, E>{
+        self(other)
+    }
+}
+
