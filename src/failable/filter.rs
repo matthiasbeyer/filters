@@ -255,3 +255,30 @@ impl<I, E: Error, T: Fn(&I) -> Result<bool, E>> FailableFilter<I, E> for T {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Debug)]
+    struct StupError { }
+
+    impl ::std::fmt::Display for StupError {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+            Ok(())
+        }
+    }
+
+    impl Error for StupError {
+         fn description(&self) -> &str {
+             "stub"
+         }
+    }
+
+    #[test]
+    fn compile_test() {
+        let a = |r: &i32| -> Result<bool, StupError> { Ok(true) };
+
+        assert!(a.filter(&1).unwrap());
+    }
+}
+
