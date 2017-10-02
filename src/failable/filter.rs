@@ -5,12 +5,14 @@
 //
 
 use std::error::Error;
+use std::borrow::Borrow;
 
 pub use failable::ops::and::FailableAnd;
 pub use failable::ops::bool::FailableBool;
 pub use failable::ops::not::FailableNot;
 pub use failable::ops::xor::FailableXOr;
 pub use failable::ops::or::FailableOr;
+pub use failable::ops::map::{FailableMapInput, FailableMapErr};
 
 /// Trait for converting something into a Filter
 pub trait IntoFailableFilter<N, E: Error + Sized> {
@@ -374,6 +376,80 @@ pub trait FailableFilter<N, E: Error> {
         where Self: Sized,
     {
         FailableNot::new(FailableAnd::new(self, other))
+    }
+
+    /// Helper to transform the input of a filter
+    ///
+    /// ```
+    /// # #[derive(Debug)]
+    /// # struct ErrorStub { }
+    /// #
+    /// # impl ::std::fmt::Display for ErrorStub {
+    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+    /// #         Ok(())
+    /// #     }
+    /// # }
+    /// #
+    /// # impl ::std::error::Error for ErrorStub {
+    /// #     fn description(&self) -> &str { "stub" }
+    /// # }
+    /// #
+    /// use filters::failable::filter::FailableFilter;
+    ///
+    /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a > 1) });
+    /// let b = (|&a: &i64| -> Result<bool, ErrorStub> { Ok(a < 7) });
+    /// let b = b.map_input(|&x: &usize| x as i64);
+    /// let c = a.and(b);
+    ///
+    /// assert!(!c.filter(&1).unwrap());
+    /// assert!(c.filter(&3).unwrap());
+    /// assert!(c.filter(&4).unwrap());
+    /// assert!(c.filter(&6).unwrap());
+    /// assert!(!c.filter(&9).unwrap());
+    /// ```
+    fn map_input<O, B, T, M>(self, map: M) -> FailableMapInput<Self, M, O, B>
+        where Self: Sized,
+              M: Fn(&T) -> N,
+              B: Borrow<O> + Sized
+    {
+        FailableMapInput::new(self, map)
+    }
+
+    /// Helper to transform the input of a filter
+    ///
+    /// ```
+    /// # use std::fmt;
+    /// # #[derive(Debug)]
+    /// # struct ErrorStub { }
+    /// #
+    /// # impl ::std::fmt::Display for ErrorStub {
+    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+    /// #         Ok(())
+    /// #     }
+    /// # }
+    /// #
+    /// # impl ::std::error::Error for ErrorStub {
+    /// #     fn description(&self) -> &str { "stub" }
+    /// # }
+    /// #
+    /// use filters::failable::filter::FailableFilter;
+    ///
+    /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a > 1) });
+    /// let b = (|&a: &usize| -> Result<bool, fmt::Error> { Ok(a < 7) });
+    /// let b = b.map_err(|_: fmt::Error| ErrorStub {});
+    /// let c = a.and(b);
+    ///
+    /// assert!(!c.filter(&1).unwrap());
+    /// assert!(c.filter(&3).unwrap());
+    /// assert!(c.filter(&4).unwrap());
+    /// assert!(c.filter(&6).unwrap());
+    /// assert!(!c.filter(&9).unwrap());
+    /// ```
+    fn map_err<M, OE>(self, map: M) -> FailableMapErr<Self, M, E, OE>
+        where Self: Sized,
+              M: Fn(E) -> OE
+    {
+        FailableMapErr::new(self, map)
     }
 
 }

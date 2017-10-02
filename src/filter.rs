@@ -6,12 +6,14 @@
 
 //! The filter implementation
 //!
+use std::borrow::Borrow;
 
 pub use ops::and::And;
 pub use ops::bool::Bool;
 pub use ops::not::Not;
 pub use ops::xor::XOr;
 pub use ops::or::Or;
+pub use ops::map::MapInput;
 
 /// Trait for converting something into a Filter
 pub trait IntoFilter<N> {
@@ -36,7 +38,7 @@ impl<I, T: Fn(&I) -> bool> Filter<I> for T {
     }
 }
 
-/// The filter trai
+/// The filter trait
 pub trait Filter<N> {
 
     /// The function which is used to filter something
@@ -256,6 +258,29 @@ pub trait Filter<N> {
         Not::new(And::new(self, other))
     }
 
+    /// Helper to transform the input of a filter
+    ///
+    /// ```
+    /// use filters::filter::Filter;
+    ///
+    /// let a = (|&a: &usize| { a > 1 });
+    /// let b = (|&a: &i64| { a < 7 });
+    /// let b = b.map_input(|&x: &usize| { x as i64 });
+    /// let c = a.and(b);
+    ///
+    /// assert!(!c.filter(&1));
+    /// assert!(c.filter(&3));
+    /// assert!(c.filter(&4));
+    /// assert!(c.filter(&6));
+    /// assert!(!c.filter(&9));
+    /// ```
+    fn map_input<O, B, T, M>(self, map: M) -> MapInput<Self, M, O, B>
+        where Self: Sized,
+              M: Fn(&T) -> N,
+              B: Borrow<O> + Sized
+    {
+        MapInput::new(self, map)
+    }
 }
 
 

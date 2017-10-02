@@ -9,3 +9,4 @@ pub mod bool;
 pub mod not;
 pub mod xor;
 pub mod or;
+pub mod map;
