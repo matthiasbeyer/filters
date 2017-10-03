@@ -11,7 +11,6 @@
 //!
 use std::marker::PhantomData;
 use std::borrow::Borrow;
-use std::error::Error;
 
 use failable::filter::FailableFilter;
 
@@ -26,8 +25,7 @@ impl<F, M, FT, B> FailableMapInput<F, M, FT, B> {
 }
 
 impl<FT, E, F, T, B, M> FailableFilter<T, E> for FailableMapInput<F, M, FT, B>
-    where E: Error,
-          F: FailableFilter<FT, E>,
+    where F: FailableFilter<FT, E>,
           B: Borrow<FT> + Sized,
           M: Fn(&T) -> B
 {
@@ -47,9 +45,7 @@ impl<F, M, FE, E> FailableMapErr<F, M, FE, E> {
 }
 
 impl<FE, E, F, T, M> FailableFilter<T, E> for FailableMapErr<F, M, FE, E>
-    where E: Error,
-          FE: Error,
-          F: FailableFilter<T, FE>,
+    where F: FailableFilter<T, FE>,
           M: Fn(FE) -> E
 {
     fn filter(&self, e: &T) -> Result<bool, E> {

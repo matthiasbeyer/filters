@@ -10,7 +10,6 @@
 //! shouldn't be necessary.
 //!
 
-use std::error::Error;
 use failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
@@ -33,7 +32,7 @@ impl From<bool> for FailableBool {
 
 }
 
-impl<N, E: Error> FailableFilter<N, E> for FailableBool {
+impl<N, E> FailableFilter<N, E> for FailableBool {
     fn filter(&self, _: &N) -> Result<bool, E> {
         Ok(self.0)
     }

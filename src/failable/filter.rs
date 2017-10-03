@@ -4,7 +4,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-use std::error::Error;
 use std::borrow::Borrow;
 
 pub use failable::ops::and::FailableAnd;
@@ -15,14 +14,14 @@ pub use failable::ops::or::FailableOr;
 pub use failable::ops::map::{FailableMapInput, FailableMapErr};
 
 /// Trait for converting something into a Filter
-pub trait IntoFailableFilter<N, E: Error + Sized> {
+pub trait IntoFailableFilter<N, E: Sized> {
     type IntoFilt: FailableFilter<N, E>;
 
     fn into_failable_filter(self) -> Self::IntoFilt;
 }
 
 /// All Filters can be turned into Filters
-impl<N, E: Error + Sized, I: FailableFilter<N, E>> IntoFailableFilter<N, E> for I {
+impl<N, E: Sized, I: FailableFilter<N, E>> IntoFailableFilter<N, E> for I {
     type IntoFilt = I;
 
     fn into_failable_filter(self) -> Self::IntoFilt {
@@ -30,7 +29,7 @@ impl<N, E: Error + Sized, I: FailableFilter<N, E>> IntoFailableFilter<N, E> for 
     }
 }
 
-pub trait FailableFilter<N, E: Error> {
+pub trait FailableFilter<N, E> {
     /// The function which is used to filter something
     fn filter(&self, &N) -> Result<bool, E>;
 
@@ -39,16 +38,6 @@ pub trait FailableFilter<N, E: Error> {
     /// ```
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
-    /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
     /// #
     /// use filters::failable::filter::FailableFilter;
     ///
@@ -67,16 +56,6 @@ pub trait FailableFilter<N, E: Error> {
     /// ```
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
-    /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
     /// #
     /// use filters::failable::filter::FailableFilter;
     ///
@@ -101,16 +80,6 @@ pub trait FailableFilter<N, E: Error> {
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
     /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
-    /// #
     /// use filters::failable::filter::FailableFilter;
     ///
     /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a == 1) });
@@ -133,16 +102,6 @@ pub trait FailableFilter<N, E: Error> {
     /// ```
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
-    /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
     /// #
     /// use filters::failable::filter::FailableFilter;
     ///
@@ -170,16 +129,6 @@ pub trait FailableFilter<N, E: Error> {
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
     /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
-    /// #
     /// use filters::failable::filter::FailableFilter;
     ///
     /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a == 1) });
@@ -202,16 +151,6 @@ pub trait FailableFilter<N, E: Error> {
     /// ```
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
-    /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
     /// #
     /// use filters::failable::filter::FailableFilter;
     ///
@@ -237,16 +176,6 @@ pub trait FailableFilter<N, E: Error> {
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
     /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
-    /// #
     /// use filters::failable::filter::FailableFilter;
     ///
     /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a > 1) });
@@ -271,16 +200,6 @@ pub trait FailableFilter<N, E: Error> {
     /// ```
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
-    /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
     /// #
     /// use filters::failable::filter::FailableFilter;
     ///
@@ -311,16 +230,6 @@ pub trait FailableFilter<N, E: Error> {
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
     /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
-    /// #
     /// use filters::failable::filter::FailableFilter;
     ///
     /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a > 10) });
@@ -348,16 +257,6 @@ pub trait FailableFilter<N, E: Error> {
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
     /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
-    /// #
     /// use filters::failable::filter::FailableFilter;
     ///
     /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a > 10) });
@@ -383,16 +282,6 @@ pub trait FailableFilter<N, E: Error> {
     /// ```
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
-    /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
     /// #
     /// use filters::failable::filter::FailableFilter;
     ///
@@ -422,16 +311,6 @@ pub trait FailableFilter<N, E: Error> {
     /// # #[derive(Debug)]
     /// # struct ErrorStub { }
     /// #
-    /// # impl ::std::fmt::Display for ErrorStub {
-    /// #     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-    /// #         Ok(())
-    /// #     }
-    /// # }
-    /// #
-    /// # impl ::std::error::Error for ErrorStub {
-    /// #     fn description(&self) -> &str { "stub" }
-    /// # }
-    /// #
     /// use filters::failable::filter::FailableFilter;
     ///
     /// let a = (|&a: &usize| -> Result<bool, ErrorStub> { Ok(a > 1) });
@@ -455,7 +334,7 @@ pub trait FailableFilter<N, E: Error> {
 }
 
 /// All closures that take a ref to something and return Result<bool, E> are failable filters
-impl<I, E: Error, T: Fn(&I) -> Result<bool, E>> FailableFilter<I, E> for T {
+impl<I, E, T: Fn(&I) -> Result<bool, E>> FailableFilter<I, E> for T {
     fn filter(&self, other: &I) -> Result<bool, E>{
         self(other)
     }
@@ -467,18 +346,6 @@ mod tests {
 
     #[derive(Debug)]
     struct StupError { }
-
-    impl ::std::fmt::Display for StupError {
-        fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
-            Ok(())
-        }
-    }
-
-    impl Error for StupError {
-         fn description(&self) -> &str {
-             "stub"
-         }
-    }
 
     #[test]
     fn compile_test() {

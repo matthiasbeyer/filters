@@ -10,7 +10,6 @@
 //! shouldn't be necessary.
 //!
 
-use std::error::Error;
 use failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
@@ -26,8 +25,7 @@ impl<T, U> FailableXOr<T, U> {
 }
 
 impl<N, E, T, U> FailableFilter<N, E> for FailableXOr<T, U>
-    where E: Error,
-          T: FailableFilter<N, E>,
+    where T: FailableFilter<N, E>,
           U: FailableFilter<N, E>
 {
     fn filter(&self, e: &N) -> Result<bool, E> {
