@@ -10,3 +10,4 @@ pub mod not;
 pub mod or;
 pub mod xor;
 pub mod map;
+pub mod failable;

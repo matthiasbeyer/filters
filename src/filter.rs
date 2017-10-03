@@ -14,6 +14,7 @@ pub use ops::not::Not;
 pub use ops::xor::XOr;
 pub use ops::or::Or;
 pub use ops::map::MapInput;
+pub use ops::failable::{IntoFailable, AsFailable};
 
 /// Trait for converting something into a Filter
 pub trait IntoFilter<N> {
@@ -280,6 +281,45 @@ pub trait Filter<N> {
               B: Borrow<O> + Sized
     {
         MapInput::new(self, map)
+    }
+
+    /// Helper to transform a filter into a FailableFilter
+    ///
+    /// ```
+    /// use filters::filter::Filter;
+    /// use filters::failable::filter::FailableFilter;
+    ///
+    /// let a = (|&a: &usize| { a > 5 });
+    /// let a = a.into_failable();
+    /// 
+    /// assert_eq!(a.filter(&3), Ok(false));
+    /// assert_eq!(a.filter(&5), Ok(false));
+    /// assert_eq!(a.filter(&7), Ok(true));
+    /// assert_eq!(a.filter(&9), Ok(true));
+    /// ```
+    fn into_failable(self) -> IntoFailable<Self, ()>
+        where Self: Sized
+    {
+        IntoFailable::new(self)
+    }
+
+    /// Helper to borrow a filter as a FailbleFilter
+    ///
+    /// ```
+    /// use filters::filter::Filter;
+    /// use filters::failable::filter::FailableFilter;
+    ///
+    /// let a = (|&a: &usize| { a > 5 });
+    /// let b = a.as_failable();
+    /// 
+    /// assert_eq!(a.filter(&3), false);
+    /// assert_eq!(b.filter(&3), Ok(false));
+    /// assert_eq!(a.filter(&7), true);
+    /// assert_eq!(b.filter(&7), Ok(true));
+    fn as_failable<'a>(&'a self) -> AsFailable<'a, Self, ()>
+        where Self: 'a
+    {
+        AsFailable::new(self)
     }
 }
 
