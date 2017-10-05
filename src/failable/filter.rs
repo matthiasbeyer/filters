@@ -384,5 +384,36 @@ mod tests {
 
         assert!(e.filter(&1).is_err());
     }
+
+    #[test]
+    fn test_both_filter_types() {
+        use filter::Filter;
+
+        let a = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let b = |_: &i32| -> bool { true };
+        let c = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let d = |_: &i32| -> bool { false };
+
+        let e = a                                               // true
+            .and(b.into_failable().map_err(|_| StupError {}))   // true
+            .xor(c)                                             // true
+            .or(d.into_failable().map_err(|_| StupError {}));   // true
+
+        assert!(!e.filter(&1).unwrap());
+    }
+
+
+    #[test]
+    fn test_both_filter_types_in_one_scope() {
+        use filter::Filter;
+        use failable::filter::FailableFilter;
+
+        let failable   = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let unfailable = |_: &i32| -> bool { true };
+
+        assert!(failable.filter(&1).unwrap());
+        assert!(unfailable.filter(&1));
+
+    }
 }
 
