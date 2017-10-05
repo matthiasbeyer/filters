@@ -6,7 +6,7 @@
 
 //! Bool Filter implementation, so we can insert this in filter construction
 //!
-//! Will be automatically included when incluing `filter::Filter`, so importing this module
+//! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
 use filter::Filter;
