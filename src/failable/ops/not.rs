@@ -4,31 +4,30 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-//! Bool Filter implementation, so we can insert this in filter construction
+//! NOT implementation.
 //!
 //! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
-use filter::Filter;
+
+use failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct Bool(bool);
+pub struct FailableNot<T>(T);
 
-impl Bool {
+impl<T> FailableNot<T> {
 
-    pub fn new(b: bool) -> Bool {
-        Bool(b)
+    pub fn new(a: T) -> FailableNot<T> {
+        FailableNot(a)
     }
 
 }
 
-impl From<bool> for Bool {
-
-    fn from(b: bool) -> Bool {
-        Bool::new(b)
+impl<N, E, T> FailableFilter<N, E> for FailableNot<T>
+    where T: FailableFilter<N, E>
+{
+    fn filter(&self, e: &N) -> Result<bool, E> {
+        self.0.filter(e).map(|b| !b)
     }
-
 }
-
-impl_operators!(Bool, self e { self.0 }, );

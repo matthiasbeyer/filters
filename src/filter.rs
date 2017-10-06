@@ -6,12 +6,15 @@
 
 //! The filter implementation
 //!
+use std::borrow::Borrow;
 
 pub use ops::and::And;
 pub use ops::bool::Bool;
 pub use ops::not::Not;
 pub use ops::xor::XOr;
 pub use ops::or::Or;
+pub use ops::map::MapInput;
+pub use ops::failable::{IntoFailable, AsFailable};
 
 /// Trait for converting something into a Filter
 pub trait IntoFilter<N> {
@@ -36,7 +39,7 @@ impl<I, T: Fn(&I) -> bool> Filter<I> for T {
     }
 }
 
-/// The filter trai
+/// The filter trait
 pub trait Filter<N> {
 
     /// The function which is used to filter something
@@ -256,6 +259,68 @@ pub trait Filter<N> {
         Not::new(And::new(self, other))
     }
 
+    /// Helper to transform the input of a filter
+    ///
+    /// ```
+    /// use filters::filter::Filter;
+    ///
+    /// let a = (|&a: &usize| { a > 1 });
+    /// let b = (|&a: &i64| { a < 7 });
+    /// let b = b.map_input(|&x: &usize| { x as i64 });
+    /// let c = a.and(b);
+    ///
+    /// assert!(!c.filter(&1));
+    /// assert!(c.filter(&3));
+    /// assert!(c.filter(&4));
+    /// assert!(c.filter(&6));
+    /// assert!(!c.filter(&9));
+    /// ```
+    fn map_input<O, B, T, M>(self, map: M) -> MapInput<Self, M, O, B>
+        where Self: Sized,
+              M: Fn(&T) -> N,
+              B: Borrow<O> + Sized
+    {
+        MapInput::new(self, map)
+    }
+
+    /// Helper to transform a filter into a FailableFilter
+    ///
+    /// ```
+    /// use filters::filter::Filter;
+    /// use filters::failable::filter::FailableFilter;
+    ///
+    /// let a = (|&a: &usize| { a > 5 });
+    /// let a = a.into_failable();
+    /// 
+    /// assert_eq!(a.filter(&3), Ok(false));
+    /// assert_eq!(a.filter(&5), Ok(false));
+    /// assert_eq!(a.filter(&7), Ok(true));
+    /// assert_eq!(a.filter(&9), Ok(true));
+    /// ```
+    fn into_failable(self) -> IntoFailable<Self, ()>
+        where Self: Sized
+    {
+        IntoFailable::new(self)
+    }
+
+    /// Helper to borrow a filter as a FailbleFilter
+    ///
+    /// ```
+    /// use filters::filter::Filter;
+    /// use filters::failable::filter::FailableFilter;
+    ///
+    /// let a = (|&a: &usize| { a > 5 });
+    /// let b = a.as_failable();
+    /// 
+    /// assert_eq!(a.filter(&3), false);
+    /// assert_eq!(b.filter(&3), Ok(false));
+    /// assert_eq!(a.filter(&7), true);
+    /// assert_eq!(b.filter(&7), Ok(true));
+    fn as_failable<'a>(&'a self) -> AsFailable<'a, Self, ()>
+        where Self: 'a
+    {
+        AsFailable::new(self)
+    }
 }
 
 

@@ -9,18 +9,27 @@
 //! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
-use filter::Filter;
+
+use failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct And<T, U>(T, U);
+pub struct FailableAnd<T, U>(T, U);
 
-impl<T, U> And<T, U> {
+impl<T, U> FailableAnd<T, U> {
 
-    pub fn new(a: T, b: U) -> And<T, U> {
-        And(a, b)
+    pub fn new(a: T, b: U) -> FailableAnd<T, U> {
+        FailableAnd(a, b)
     }
 
 }
 
-impl_operators!(And, self e { self.0.filter(e) && self.1.filter(e) }, T, U);
+impl<N, E, T, U> FailableFilter<N, E> for FailableAnd<T, U>
+    where T: FailableFilter<N, E>,
+          U: FailableFilter<N, E>
+{
+    fn filter(&self, e: &N) -> Result<bool, E> {
+        Ok(try!(self.0.filter(e)) && try!(self.1.filter(e)))
+    }
+}
+

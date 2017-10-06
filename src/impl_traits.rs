@@ -67,3 +67,40 @@ macro_rules! impl_operators {
         impl_operators!($struct_ident, $self_var $arg_var $filter_impl, );
     };
 }
+
+/// Variant of impl_operators!() macro for FailableFilter types
+#[macro_export]
+macro_rules! impl_failable_operators {
+    ($struct_ident:ident, $self_var: ident $arg_var: ident $filter_impl:block, $( $generic:ident ),*) => {
+        #[cfg(feature = "unstable-filter-as-fn")]
+        impl<'a, I, $( $generic: Filter<I>, )*> FnOnce<(&'a I,)> for $struct_ident<$( $generic, )*> {
+            type Output = Result<bool, Error>;
+            extern "rust-call" fn call_once<'b>(self, (arg,): (&'a I,)) -> Self::Output {
+                self.filter(arg)
+            }
+        }
+
+        #[cfg(feature = "unstable-filter-as-fn")]
+        impl<'a, I, $( $generic: Filter<I>, )*> FnMut<(&'a I,)> for $struct_ident<$( $generic, )*> {
+            extern "rust-call" fn call_mut<'b>(&mut self, (arg,): (&'a I,)) -> Self::Output {
+                self.filter(arg)
+            }
+        }
+
+        #[cfg(feature = "unstable-filter-as-fn")]
+        impl<'a, I, $( $generic: Filter<I>, )*> Fn<(&'a I,)> for $struct_ident<$( $generic, )*> {
+            #[allow(unused_variables)]
+            extern "rust-call" fn call<'b>(&$self_var, ($arg_var,): (&'a I,)) -> Self::Output $filter_impl
+        }
+
+        #[cfg(not(feature = "unstable-filter-as-fn"))]
+        impl<I, $( $generic: FailableFilter<I>, )*> FailableFilter<I> for $struct_ident<$( $generic, )*> {
+            #[allow(unused_variables)]
+            fn filter(&$self_var, $arg_var: &I) -> Result<bool, Error> $filter_impl
+        }
+    };
+    ($struct_ident:ident, $self_var: ident $arg_var: ident $filter_impl: block) => {
+        impl_operators!($struct_ident, $self_var $arg_var $filter_impl, );
+    };
+}
+
