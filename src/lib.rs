@@ -78,5 +78,6 @@
 pub mod impl_traits;
 pub mod filter;
 pub mod failable;
+pub mod iter;
 pub mod ops;
 
