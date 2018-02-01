@@ -323,6 +323,17 @@ pub trait Filter<N> {
     }
 }
 
+#[macro_export]
+macro_rules! make_filter {
+    ($type:ty => $over:ty => $expression:expr) => {
+        impl Filter<$over> for $type {
+            fn filter(&self, element: &$over) -> bool {
+                $expression(self, element)
+            }
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod test {
@@ -447,6 +458,20 @@ mod test {
         let r : Vec<usize> = v.into_iter().filter(|x| inrange.filter(x)).collect();
 
         assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    }
+
+    #[test]
+    fn filter_macro_generated() {
+        struct LowerThan(u64);
+        make_filter! {
+            LowerThan => u64 => |this: &LowerThan, e| e < &this.0
+        };
+
+        let lt = LowerThan(10);
+        assert_eq!(lt.filter(&0),  true);
+        assert_eq!(lt.filter(&1),  true);
+        assert_eq!(lt.filter(&17), false);
+        assert_eq!(lt.filter(&42), false);
     }
 }
 
