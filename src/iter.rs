@@ -39,6 +39,88 @@ impl<I, T, F: Filter<T>> FilterWith<T, F> for I
     }
 }
 
+
+pub struct FilterOksIter<T, E, I, F>(I, F)
+    where F: Filter<T>,
+          I: Iterator<Item = Result<T, E>>;
+
+impl<T, E, I, F> Iterator for FilterOksIter<T, E, I, F>
+    where F: Filter<T>,
+          I: Iterator<Item = Result<T, E>>
+{
+    type Item = Result<T, E>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(next) = self.0.next() {
+            match next {
+                Err(e) => return Some(Err(e)),
+                Ok(t)  => if self.1.filter(&t) {
+                    return Some(Ok(t));
+                }
+            }
+        }
+
+        None
+    }
+}
+
+pub trait FilterOks<T, E, I, F> : Iterator<Item = Result<T, E>>
+    where I: Iterator<Item = Result<T, E>>,
+          F: Filter<T>
+{
+    fn filter_oks(self, F) -> FilterOksIter<T, E, I, F>;
+}
+
+impl<T, E, I, F> FilterOks<T, E, I, F> for I
+    where I: Iterator<Item = Result<T, E>>,
+          F: Filter<T>
+{
+    fn filter_oks(self, f: F) -> FilterOksIter<T, E, I, F> {
+        FilterOksIter(self, f)
+    }
+}
+
+pub struct FilterErrIter<T, E, I, F>(I, F)
+    where F: Filter<E>,
+          I: Iterator<Item = Result<T, E>>;
+
+impl<T, E, I, F> Iterator for FilterErrIter<T, E, I, F>
+    where F: Filter<E>,
+          I: Iterator<Item = Result<T, E>>
+{
+    type Item = Result<T, E>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(next) = self.0.next() {
+            match next {
+                Ok(t) => return Some(Ok(t)),
+                Err(e) => if self.1.filter(&e) {
+                    return Some(Err(e));
+                }
+            }
+        }
+
+        None
+    }
+}
+
+pub trait FilterErr<T, E, I, F> : Iterator<Item = Result<T, E>>
+    where I: Iterator<Item = Result<T, E>>,
+          F: Filter<E>
+{
+    fn filter_errs(self, F) -> FilterErrIter<T, E, I, F>;
+}
+
+impl<T, E, I, F> FilterErr<T, E, I, F> for I
+    where I: Iterator<Item = Result<T, E>>,
+          F: Filter<E>
+{
+    fn filter_errs(self, f: F) -> FilterErrIter<T, E, I, F> {
+        FilterErrIter(self, f)
+    }
+}
+
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -61,4 +143,45 @@ mod test {
 
         assert_eq!(v, vec![6, 7, 8, 9]);
     }
+
+    #[test]
+    fn test_filter_oks() {
+        struct Foo;
+        impl Filter<u64> for Foo {
+            fn filter(&self, u: &u64) -> bool {
+                *u > 5
+            }
+        }
+
+        let foo = Foo;
+
+        let v : Vec<Result<u64, u64>> =
+            vec![Ok(1), Err(2), Ok(3), Err(4), Ok(5), Err(6), Ok(7), Err(8), Ok(9), Err(0)]
+            .into_iter()
+            .filter_oks(foo)
+            .collect();
+
+        assert_eq!(v, vec![Err(2), Err(4), Err(6), Ok(7), Err(8), Ok(9), Err(0)]);
+    }
+
+    #[test]
+    fn test_filter_errs() {
+        struct Foo;
+        impl Filter<u64> for Foo {
+            fn filter(&self, u: &u64) -> bool {
+                *u > 5
+            }
+        }
+
+        let foo = Foo;
+
+        let v : Vec<Result<u64, u64>> =
+            vec![Ok(1), Err(2), Ok(3), Err(4), Ok(5), Err(6), Ok(7), Err(8), Ok(9), Err(0)]
+            .into_iter()
+            .filter_errs(foo)
+            .collect();
+
+        assert_eq!(v, vec![Ok(1), Ok(3), Ok(5), Err(6), Ok(7), Err(8), Ok(9)]);
+    }
 }
+
