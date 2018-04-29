@@ -1,18 +1,18 @@
 [package]
-name = "filters"
-version = "0.2.0"
+name    = "filters"
+version = "0.3.0"
 authors = ["Matthias Beyer <mail@beyermatthias.de>",
            "Marcel Müller <neikos@neikos.email>" ]
 
-description = "Build filters/predicates with the builder pattern"
-keywords = ["iterator", "filter", "builder", "util"]
+description   = "Build filters/predicates with the builder pattern"
+keywords      = ["iterator", "filter", "builder", "util"]
 readme        = "./README.md"
 license       = "MPL-2.0"
 
 documentation = "https://matthiasbeyer.github.io/filters/filters/index.html"
-repository = "https://github.com/matthiasbeyer/filters"
+repository    = "https://github.com/matthiasbeyer/filters"
 
 [dependencies]
 
 [features]
-unstable-filter-as-fn=[]
+unstable-filter-as-fn = []
