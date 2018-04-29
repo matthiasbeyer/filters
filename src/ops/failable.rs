@@ -9,43 +9,46 @@
 //! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
-use std::marker::PhantomData;
 
 use filter::Filter;
 use failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct IntoFailable<F, E>(F, PhantomData<E>);
+pub struct IntoFailable<F>(F);
 
-impl<F, E> IntoFailable<F, E> {
-    pub fn new(a: F) -> IntoFailable<F, E> {
-        IntoFailable(a, PhantomData)
+impl<F> IntoFailable<F> {
+    pub fn new(a: F) -> IntoFailable<F> {
+        IntoFailable(a)
     }
 }
 
-impl<F, N, E> FailableFilter<N, E> for IntoFailable<F, E>
+impl<F, N> FailableFilter<N> for IntoFailable<F>
     where F: Filter<N>,
 {
-    fn filter(&self, e: &N) -> Result<bool, E> {
+    type Error = ();
+
+    fn filter(&self, e: &N) -> Result<bool, Self::Error> {
         Ok(self.0.filter(e))
     }
 }
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct AsFailable<'a, F: 'a + ?Sized, E>(&'a F, PhantomData<E>);
+pub struct AsFailable<'a, F: 'a + ?Sized>(&'a F);
 
-impl<'a, F: 'a + ?Sized, E> AsFailable<'a, F, E> {
-    pub fn new(a: &'a F) -> AsFailable<F, E> {
-        AsFailable(a, PhantomData)
+impl<'a, F: 'a + ?Sized> AsFailable<'a, F> {
+    pub fn new(a: &'a F) -> AsFailable<F> {
+        AsFailable(a)
     }
 }
 
-impl<'a, F, N, E> FailableFilter<N, E> for AsFailable<'a, F, E>
+impl<'a, F, N> FailableFilter<N> for AsFailable<'a, F>
     where F: Filter<N> + 'a + ?Sized,
 {
-    fn filter(&self, e: &N) -> Result<bool, E> {
+    type Error = ();
+
+    fn filter(&self, e: &N) -> Result<bool, Self::Error> {
         Ok(self.0.filter(e))
     }
 }
