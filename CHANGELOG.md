@@ -2,6 +2,8 @@
 
 # Next
 
+# 0.3.0
+
 * A macro was added to quickly create `Filter` implementations
 * An extension for iterators was added to filter the iterator with the filter
   object. This removes the need to write a closure.
