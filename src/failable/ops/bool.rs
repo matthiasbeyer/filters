@@ -32,8 +32,10 @@ impl From<bool> for FailableBool {
 
 }
 
-impl<N, E> FailableFilter<N, E> for FailableBool {
-    fn filter(&self, _: &N) -> Result<bool, E> {
+impl<N> FailableFilter<N> for FailableBool {
+    type Error = ();
+
+    fn filter(&self, _: &N) -> Result<bool, Self::Error> {
         Ok(self.0)
     }
 }

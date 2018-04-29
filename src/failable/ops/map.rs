@@ -24,31 +24,35 @@ impl<F, M, FT, B> FailableMapInput<F, M, FT, B> {
     }
 }
 
-impl<FT, E, F, T, B, M> FailableFilter<T, E> for FailableMapInput<F, M, FT, B>
-    where F: FailableFilter<FT, E>,
+impl<FT, F, T, B, M> FailableFilter<T> for FailableMapInput<F, M, FT, B>
+    where F: FailableFilter<FT>,
           B: Borrow<FT> + Sized,
           M: Fn(&T) -> B
 {
-    fn filter(&self, e: &T) -> Result<bool, E> {
+    type Error = F::Error;
+
+    fn filter(&self, e: &T) -> Result<bool, Self::Error> {
         self.0.filter(self.1(e).borrow())
     }
 }
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
-pub struct FailableMapErr<F, M, FE, E>(F, M, PhantomData<FE>, PhantomData<E>);
+pub struct FailableMapErr<F, M, E>(F, M, PhantomData<E>);
 
-impl<F, M, FE, E> FailableMapErr<F, M, FE, E> {
-    pub fn new(a: F, m: M) -> FailableMapErr<F, M, FE, E> {
-        FailableMapErr(a, m, PhantomData, PhantomData)
+impl<F, M, E> FailableMapErr<F, M, E> {
+    pub fn new(a: F, m: M) -> FailableMapErr<F, M, E> {
+        FailableMapErr(a, m, PhantomData)
     }
 }
 
-impl<FE, E, F, T, M> FailableFilter<T, E> for FailableMapErr<F, M, FE, E>
-    where F: FailableFilter<T, FE>,
-          M: Fn(FE) -> E
+impl<E, F, T, M> FailableFilter<T> for FailableMapErr<F, M, E>
+    where F: FailableFilter<T>,
+          M: Fn(F::Error) -> E
 {
-    fn filter(&self, e: &T) -> Result<bool, E> {
+    type Error = E;
+
+    fn filter(&self, e: &T) -> Result<bool, Self::Error> {
         self.0.filter(e).map_err(&self.1)
     }
 }

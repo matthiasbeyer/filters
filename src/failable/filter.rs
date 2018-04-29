@@ -14,14 +14,14 @@ pub use failable::ops::or::FailableOr;
 pub use failable::ops::map::{FailableMapInput, FailableMapErr};
 
 /// Trait for converting something into a Filter
-pub trait IntoFailableFilter<N, E: Sized> {
-    type IntoFilt: FailableFilter<N, E>;
+pub trait IntoFailableFilter<N> {
+    type IntoFilt: FailableFilter<N>;
 
     fn into_failable_filter(self) -> Self::IntoFilt;
 }
 
 /// All Filters can be turned into Filters
-impl<N, E: Sized, I: FailableFilter<N, E>> IntoFailableFilter<N, E> for I {
+impl<N, I: FailableFilter<N>> IntoFailableFilter<N> for I {
     type IntoFilt = I;
 
     fn into_failable_filter(self) -> Self::IntoFilt {
@@ -29,9 +29,11 @@ impl<N, E: Sized, I: FailableFilter<N, E>> IntoFailableFilter<N, E> for I {
     }
 }
 
-pub trait FailableFilter<N, E> {
+pub trait FailableFilter<N> {
+    type Error: Sized;
+
     /// The function which is used to filter something
-    fn filter(&self, &N) -> Result<bool, E>;
+    fn filter(&self, &N) -> Result<bool, Self::Error>;
 
     /// Helper to invert a filter.
     ///
@@ -69,7 +71,7 @@ pub trait FailableFilter<N, E> {
     /// ```
     fn or<F>(self, other: F) -> FailableOr<Self, F::IntoFilt>
         where Self: Sized,
-              F: IntoFailableFilter<N, E> + Sized
+              F: IntoFailableFilter<N> + Sized
     {
         FailableOr::new(self, other.into_failable_filter())
     }
@@ -92,7 +94,7 @@ pub trait FailableFilter<N, E> {
     /// ```
     fn or_not<F>(self, other: F) -> FailableOr<Self, FailableNot<F::IntoFilt>>
         where Self: Sized,
-              F: IntoFailableFilter<N, E> + Sized,
+              F: IntoFailableFilter<N> + Sized,
     {
         self.or(FailableNot::new(other.into_failable_filter()))
     }
@@ -117,8 +119,8 @@ pub trait FailableFilter<N, E> {
     /// ```
     fn or3<F, F2>(self, other: F, other2: F2) -> FailableOr<Self, FailableOr<F::IntoFilt, F2::IntoFilt>>
         where Self: Sized,
-              F: IntoFailableFilter<N, E> + Sized,
-              F2: IntoFailableFilter<N, E> + Sized
+              F: IntoFailableFilter<N> + Sized,
+              F2: IntoFailableFilter<N> + Sized
     {
         FailableOr::new(self, FailableOr::new(other.into_failable_filter(), other2.into_failable_filter()))
     }
@@ -190,7 +192,7 @@ pub trait FailableFilter<N, E> {
     /// ```
     fn and<F>(self, other: F) -> FailableAnd<Self, F::IntoFilt>
         where Self: Sized,
-              F: IntoFailableFilter<N, E> + Sized
+              F: IntoFailableFilter<N> + Sized
     {
         FailableAnd::new(self, other.into_failable_filter())
     }
@@ -218,8 +220,8 @@ pub trait FailableFilter<N, E> {
     /// ```
     fn and3<F, F2>(self, other: F, other2: F2) -> FailableAnd<Self, FailableAnd<F::IntoFilt, F2::IntoFilt>>
         where Self: Sized,
-              F: IntoFailableFilter<N, E> + Sized,
-              F2: IntoFailableFilter<N, E> + Sized
+              F: IntoFailableFilter<N> + Sized,
+              F2: IntoFailableFilter<N> + Sized
     {
         FailableAnd::new(self, FailableAnd::new(other.into_failable_filter(), other2.into_failable_filter()))
     }
@@ -246,7 +248,7 @@ pub trait FailableFilter<N, E> {
     /// ```
     fn and_not<F>(self, other: F) -> FailableAnd<Self, FailableNot<F::IntoFilt>>
         where Self: Sized,
-              F: IntoFailableFilter<N, E> + Sized
+              F: IntoFailableFilter<N> + Sized
     {
         self.and(FailableNot::new(other.into_failable_filter()))
     }
@@ -324,9 +326,9 @@ pub trait FailableFilter<N, E> {
     /// assert!(c.filter(&6).unwrap());
     /// assert!(!c.filter(&9).unwrap());
     /// ```
-    fn map_err<M, OE>(self, map: M) -> FailableMapErr<Self, M, E, OE>
+    fn map_err<M, OE>(self, map: M) -> FailableMapErr<Self, M, OE>
         where Self: Sized,
-              M: Fn(E) -> OE
+              M: Fn(Self::Error) -> OE
     {
         FailableMapErr::new(self, map)
     }
@@ -334,8 +336,12 @@ pub trait FailableFilter<N, E> {
 }
 
 /// All closures that take a ref to something and return Result<bool, E> are failable filters
-impl<I, E, T: Fn(&I) -> Result<bool, E>> FailableFilter<I, E> for T {
-    fn filter(&self, other: &I) -> Result<bool, E>{
+impl<I, E, T> FailableFilter<I> for T
+    where T: Fn(&I) -> Result<bool, E>
+{
+    type Error = E;
+
+    fn filter(&self, other: &I) -> Result<bool, Self::Error> {
         self(other)
     }
 }

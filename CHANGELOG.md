@@ -5,6 +5,7 @@
 * A macro was added to quickly create `Filter` implementations
 * An extension for iterators was added to filter the iterator with the filter
   object. This removes the need to write a closure.
+* `FailableFilter` uses an associated type for the error output type now.
 
 # 0.2.0
 

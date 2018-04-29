@@ -297,7 +297,7 @@ pub trait Filter<N> {
     /// assert_eq!(a.filter(&7), Ok(true));
     /// assert_eq!(a.filter(&9), Ok(true));
     /// ```
-    fn into_failable(self) -> IntoFailable<Self, ()>
+    fn into_failable(self) -> IntoFailable<Self>
         where Self: Sized
     {
         IntoFailable::new(self)
@@ -316,7 +316,7 @@ pub trait Filter<N> {
     /// assert_eq!(b.filter(&3), Ok(false));
     /// assert_eq!(a.filter(&7), true);
     /// assert_eq!(b.filter(&7), Ok(true));
-    fn as_failable<'a>(&'a self) -> AsFailable<'a, Self, ()>
+    fn as_failable<'a>(&'a self) -> AsFailable<'a, Self>
         where Self: 'a
     {
         AsFailable::new(self)

@@ -24,10 +24,12 @@ impl<T> FailableNot<T> {
 
 }
 
-impl<N, E, T> FailableFilter<N, E> for FailableNot<T>
-    where T: FailableFilter<N, E>
+impl<N, T> FailableFilter<N> for FailableNot<T>
+    where T: FailableFilter<N>
 {
-    fn filter(&self, e: &N) -> Result<bool, E> {
+    type Error = T::Error;
+
+    fn filter(&self, e: &N) -> Result<bool, Self::Error> {
         self.0.filter(e).map(|b| !b)
     }
 }

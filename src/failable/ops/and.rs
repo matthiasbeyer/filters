@@ -24,11 +24,13 @@ impl<T, U> FailableAnd<T, U> {
 
 }
 
-impl<N, E, T, U> FailableFilter<N, E> for FailableAnd<T, U>
-    where T: FailableFilter<N, E>,
-          U: FailableFilter<N, E>
+impl<N, T, U, E> FailableFilter<N> for FailableAnd<T, U>
+    where T: FailableFilter<N, Error = E>,
+          U: FailableFilter<N, Error = E>
 {
-    fn filter(&self, e: &N) -> Result<bool, E> {
+    type Error = E;
+
+    fn filter(&self, e: &N) -> Result<bool, Self::Error> {
         Ok(try!(self.0.filter(e)) && try!(self.1.filter(e)))
     }
 }
