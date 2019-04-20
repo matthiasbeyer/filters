@@ -302,25 +302,6 @@ pub trait Filter<N> {
     {
         IntoFailable::new(self)
     }
-
-    /// Helper to borrow a filter as a FailbleFilter
-    ///
-    /// ```
-    /// use filters::filter::Filter;
-    /// use filters::failable::filter::FailableFilter;
-    ///
-    /// let a = (|&a: &usize| { a > 5 });
-    /// let b = a.as_failable();
-    /// 
-    /// assert_eq!(a.filter(&3), false);
-    /// assert_eq!(b.filter(&3), Ok(false));
-    /// assert_eq!(a.filter(&7), true);
-    /// assert_eq!(b.filter(&7), Ok(true));
-    fn as_failable<'a>(&'a self) -> AsFailable<'a, Self>
-        where Self: 'a
-    {
-        AsFailable::new(self)
-    }
 }
 
 #[macro_export]
