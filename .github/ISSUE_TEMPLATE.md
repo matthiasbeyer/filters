@@ -1,15 +1,12 @@
 <!--
 
-Thank you very much for contributing to filters.
+IMPORTANT NOTICE
 
-Please notice: I, the author of filters, am currently on a sabatical (May 2018
-until early 2019). I am not sure whether I will have access to the internet
-during that time. I may respond slowly - delay of 2-4 weeks or even more are
-possible! I hope it won't be more.
+Github is only used for CI right now, main development continues on the
+mailinglist.
 
-@TheNeikos has commit rights for this repository and will hopefully respond
-faster than I can.
+Please send issues and pull requests (either via `git request-pull` or `git
+format-patch` + `git send-email`) to
+[the imag mailinglist](https://imag-pim.org/mailinglist/).
 
 -->
-
-
