@@ -31,7 +31,7 @@ impl<N, T, U, E> FailableFilter<N> for FailableXOr<T, U>
     type Error = E;
 
     fn filter(&self, e: &N) -> Result<bool, Self::Error> {
-        Ok(try!(self.0.filter(e)) ^ try!(self.1.filter(e)))
+        Ok(self.0.filter(e)? ^ self.1.filter(e)?)
     }
 }
 
