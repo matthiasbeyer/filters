@@ -134,11 +134,11 @@ mod test {
             }
         }
 
-        let foo = Foo;
+        let f = Foo;
 
         let v : Vec<u64> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
             .into_iter()
-            .filter_with(foo)
+            .filter_with(f)
             .collect();
 
         assert_eq!(v, vec![6, 7, 8, 9]);
@@ -153,12 +153,12 @@ mod test {
             }
         }
 
-        let foo = Foo;
+        let f = Foo;
 
         let v : Vec<Result<u64, u64>> =
             vec![Ok(1), Err(2), Ok(3), Err(4), Ok(5), Err(6), Ok(7), Err(8), Ok(9), Err(0)]
             .into_iter()
-            .filter_oks(foo)
+            .filter_oks(f)
             .collect();
 
         assert_eq!(v, vec![Err(2), Err(4), Err(6), Ok(7), Err(8), Ok(9), Err(0)]);
@@ -173,12 +173,12 @@ mod test {
             }
         }
 
-        let foo = Foo;
+        let f = Foo;
 
         let v : Vec<Result<u64, u64>> =
             vec![Ok(1), Err(2), Ok(3), Err(4), Ok(5), Err(6), Ok(7), Err(8), Ok(9), Err(0)]
             .into_iter()
-            .filter_errs(foo)
+            .filter_errs(f)
             .collect();
 
         assert_eq!(v, vec![Ok(1), Ok(3), Ok(5), Err(6), Ok(7), Err(8), Ok(9)]);
