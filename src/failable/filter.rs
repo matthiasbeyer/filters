@@ -355,7 +355,7 @@ mod tests {
 
     #[test]
     fn compile_test() {
-        let a = |r: &i32| -> Result<bool, StupError> { Ok(true) };
+        let a = |_: &i32| -> Result<bool, StupError> { Ok(true) };
 
         assert!(a.filter(&1).unwrap());
     }
