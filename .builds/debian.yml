@@ -1,0 +1,18 @@
+image: debian/stable
+sources:
+  - https://git.sr.ht/~matthiasbeyer/filters
+packages:
+  - curl
+  - openssl
+tasks:
+  - install: curl https://sh.rustup.rs -sSf | sh -s -- -y
+  - build: |
+      cd filters
+      PATH="$HOME/.cargo/bin:$PATH" cargo build --all
+  - test: |
+      cd filters
+      PATH="$HOME/.cargo/bin:$PATH" cargo test --all
+  - clippy: |
+      cd filters
+      PATH="$HOME/.cargo/bin:$PATH" rustup component add clippy
+      PATH="$HOME/.cargo/bin:$PATH" cargo clippy --all --all-targets -- -D warnings
