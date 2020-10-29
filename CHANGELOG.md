@@ -2,6 +2,22 @@
 
 # Next
 
+# 0.4.0
+
+## Breaking
+
+* `Filter::as_failable()` was removed, as it prevented making a Filter into an
+  trait object
+
+## Other
+
+* A cargo category ("rust-patterns") was added
+* The (deprecated) `try!()` macro in the codebase was replaced by the `?`
+  operator
+* Unused variable warnings were fixed
+* "Blacklisted" variable names were removed ("foo")
+
+
 # 0.3.0
 
 * A macro was added to quickly create `Filter` implementations
