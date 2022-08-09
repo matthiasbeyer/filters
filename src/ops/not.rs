@@ -16,11 +16,9 @@ use filter::Filter;
 pub struct Not<T>(T);
 
 impl<T> Not<T> {
-
     pub fn new(a: T) -> Not<T> {
         Not(a)
     }
-
 }
 
 impl_operators!(Not, self e { !self.0.filter(e) }, T);

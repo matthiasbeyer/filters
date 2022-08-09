@@ -16,11 +16,9 @@ use filter::Filter;
 pub struct Or<T, U>(T, U);
 
 impl<T, U> Or<T, U> {
-
     pub fn new(a: T, b: U) -> Or<T, U> {
         Or(a, b)
     }
-
 }
 
 impl_operators!(Or, self e { self.0.filter(e) || self.1.filter(e) }, T, U);

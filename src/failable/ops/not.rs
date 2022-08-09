@@ -17,15 +17,14 @@ use failable::filter::FailableFilter;
 pub struct FailableNot<T>(T);
 
 impl<T> FailableNot<T> {
-
     pub fn new(a: T) -> FailableNot<T> {
         FailableNot(a)
     }
-
 }
 
 impl<N, T> FailableFilter<N> for FailableNot<T>
-    where T: FailableFilter<N>
+where
+    T: FailableFilter<N>,
 {
     type Error = T::Error;
 

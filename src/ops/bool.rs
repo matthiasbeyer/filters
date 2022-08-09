@@ -16,19 +16,15 @@ use filter::Filter;
 pub struct Bool(bool);
 
 impl Bool {
-
     pub fn new(b: bool) -> Bool {
         Bool(b)
     }
-
 }
 
 impl From<bool> for Bool {
-
     fn from(b: bool) -> Bool {
         Bool::new(b)
     }
-
 }
 
 impl_operators!(Bool, self e { self.0 }, );

@@ -17,19 +17,15 @@ use failable::filter::FailableFilter;
 pub struct FailableBool(bool);
 
 impl FailableBool {
-
     pub fn new(b: bool) -> FailableBool {
         FailableBool(b)
     }
-
 }
 
 impl From<bool> for FailableBool {
-
     fn from(b: bool) -> FailableBool {
         FailableBool::new(b)
     }
-
 }
 
 impl<N> FailableFilter<N> for FailableBool {
@@ -39,4 +35,3 @@ impl<N> FailableFilter<N> for FailableBool {
         Ok(self.0)
     }
 }
-

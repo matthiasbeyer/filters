@@ -17,16 +17,15 @@ use failable::filter::FailableFilter;
 pub struct FailableXOr<T, U>(T, U);
 
 impl<T, U> FailableXOr<T, U> {
-
     pub fn new(a: T, b: U) -> FailableXOr<T, U> {
         FailableXOr(a, b)
     }
-
 }
 
 impl<N, T, U, E> FailableFilter<N> for FailableXOr<T, U>
-    where T: FailableFilter<N, Error = E>,
-          U: FailableFilter<N, Error = E>
+where
+    T: FailableFilter<N, Error = E>,
+    U: FailableFilter<N, Error = E>,
 {
     type Error = E;
 
@@ -34,5 +33,3 @@ impl<N, T, U, E> FailableFilter<N> for FailableXOr<T, U>
         Ok(self.0.filter(e)? ^ self.1.filter(e)?)
     }
 }
-
-
