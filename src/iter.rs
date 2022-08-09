@@ -19,7 +19,7 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(next) = self.1.next() {
+        while let Some(next) = self.1.by_ref().next() {
             if self.0.filter(&next) {
                 return Some(next);
             }
@@ -55,7 +55,7 @@ where
     type Item = Result<T, E>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(next) = self.0.next() {
+        while let Some(next) = self.0.by_ref().next() {
             match next {
                 Err(e) => return Some(Err(e)),
                 Ok(t) => {
@@ -101,7 +101,7 @@ where
     type Item = Result<T, E>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(next) = self.0.next() {
+        while let Some(next) = self.0.by_ref().next() {
             match next {
                 Ok(t) => return Some(Ok(t)),
                 Err(e) => {
