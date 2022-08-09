@@ -2,7 +2,7 @@
 
 A library crate to build predicates and filter.
 
-[_Documentation_](https://matthiasbeyer.github.io/filters/).
+[_Documentation_](https://docs.rs/filters/).
 
 [![Build Status](https://travis-ci.org/matthiasbeyer/filters.svg?branch=master)](https://travis-ci.org/matthiasbeyer/filters)
 [![GitHub tag](https://img.shields.io/github/tag/matthiasbeyer/filters.svg?maxAge=2592000)]()
