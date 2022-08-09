@@ -81,7 +81,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --all-features --workspace --no-deps --document-private-items
+          args: --workspace --no-deps --document-private-items
 
   test:
     needs: check
@@ -107,7 +107,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all --all-features
+          args: --all
 
   clippy:
     needs: check
@@ -122,7 +122,7 @@ jobs:
       - uses: swatinem/rust-cache@v1
       - run: rustup component add clippy
       - name: cargo-clippy
-        run: cargo clippy --all --all-targets --all-features -- -D warnings
+        run: cargo clippy --all --all-targets -- -D warnings
 
   dco-check:
     runs-on: ubuntu-latest
