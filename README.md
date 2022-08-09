@@ -4,13 +4,6 @@ A library crate to build predicates and filter.
 
 [_Documentation_](https://docs.rs/filters/).
 
-[![Build Status](https://travis-ci.org/matthiasbeyer/filters.svg?branch=master)](https://travis-ci.org/matthiasbeyer/filters)
-[![GitHub tag](https://img.shields.io/github/tag/matthiasbeyer/filters.svg?maxAge=2592000)]()
-[![Crates.io](https://img.shields.io/crates/v/filters.svg?maxAge=2592000)]()
-[![Crates.io](https://img.shields.io/crates/d/filters.svg?maxAge=2592000)]()
-[![Crates.io](https://img.shields.io/crates/dv/filters.svg?maxAge=2592000)]()
-[![Crates.io](https://img.shields.io/crates/l/filters.svg?maxAge=2592000)]()
-
 Examples explain it best:
 
 ```rust
