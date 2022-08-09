@@ -9,18 +9,16 @@
 //! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
-use filter::Filter;
+use crate::filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
 pub struct Not<T>(T);
 
 impl<T> Not<T> {
-
     pub fn new(a: T) -> Not<T> {
         Not(a)
     }
-
 }
 
 impl_operators!(Not, self e { !self.0.filter(e) }, T);

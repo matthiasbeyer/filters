@@ -10,23 +10,22 @@
 //! shouldn't be necessary.
 //!
 
-use failable::filter::FailableFilter;
+use crate::failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
 pub struct FailableOr<T, U>(T, U);
 
 impl<T, U> FailableOr<T, U> {
-
     pub fn new(a: T, b: U) -> FailableOr<T, U> {
         FailableOr(a, b)
     }
-
 }
 
 impl<N, T, U, E> FailableFilter<N> for FailableOr<T, U>
-    where T: FailableFilter<N, Error = E>,
-          U: FailableFilter<N, Error = E>
+where
+    T: FailableFilter<N, Error = E>,
+    U: FailableFilter<N, Error = E>,
 {
     type Error = E;
 
@@ -34,4 +33,3 @@ impl<N, T, U, E> FailableFilter<N> for FailableOr<T, U>
         Ok(self.0.filter(e)? || self.1.filter(e)?)
     }
 }
-

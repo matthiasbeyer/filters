@@ -72,12 +72,14 @@
 //! ```
 
 #![doc(html_root_url = "https://matthiasbeyer.github.io/filters/")]
-#![cfg_attr(feature = "unstable-filter-as-fn", feature(unboxed_closures, fn_traits))]
+#![cfg_attr(
+    feature = "unstable-filter-as-fn",
+    feature(unboxed_closures, fn_traits)
+)]
 
 #[macro_use]
 pub mod impl_traits;
-pub mod filter;
 pub mod failable;
+pub mod filter;
 pub mod iter;
 pub mod ops;
-

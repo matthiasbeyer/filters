@@ -8,13 +8,13 @@
 //!
 use std::borrow::Borrow;
 
-pub use ops::and::And;
-pub use ops::bool::Bool;
-pub use ops::not::Not;
-pub use ops::xor::XOr;
-pub use ops::or::Or;
-pub use ops::map::MapInput;
-pub use ops::failable::{IntoFailable, AsFailable};
+pub use crate::ops::and::And;
+pub use crate::ops::bool::Bool;
+pub use crate::ops::failable::{AsFailable, IntoFailable};
+pub use crate::ops::map::MapInput;
+pub use crate::ops::not::Not;
+pub use crate::ops::or::Or;
+pub use crate::ops::xor::XOr;
 
 /// Trait for converting something into a Filter
 pub trait IntoFilter<N> {
@@ -41,9 +41,8 @@ impl<I, T: Fn(&I) -> bool> Filter<I> for T {
 
 /// The filter trait
 pub trait Filter<N> {
-
     /// The function which is used to filter something
-    fn filter(&self, &N) -> bool;
+    fn filter(&self, _: &N) -> bool;
 
     /// Helper to invert a filter.
     ///
@@ -55,7 +54,8 @@ pub trait Filter<N> {
     /// assert!(f.filter(&2));
     /// ```
     fn not(self) -> Not<Self>
-        where Self: Sized
+    where
+        Self: Sized,
     {
         Not::new(self)
     }
@@ -74,8 +74,9 @@ pub trait Filter<N> {
     /// assert!(!c.filter(&7));
     /// ```
     fn or<F>(self, other: F) -> Or<Self, F::IntoFilt>
-        where Self: Sized,
-              F: IntoFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFilter<N> + Sized,
     {
         Or::new(self, other.into_filter())
     }
@@ -94,8 +95,9 @@ pub trait Filter<N> {
     /// assert!(c.filter(&7));
     /// ```
     fn or_not<F>(self, other: F) -> Or<Self, Not<F::IntoFilt>>
-        where Self: Sized,
-              F: IntoFilter<N> + Sized,
+    where
+        Self: Sized,
+        F: IntoFilter<N> + Sized,
     {
         self.or(Not::new(other.into_filter()))
     }
@@ -116,9 +118,10 @@ pub trait Filter<N> {
     /// assert!(!d.filter(&4));
     /// ```
     fn or3<F, F2>(self, other: F, other2: F2) -> Or<Self, Or<F::IntoFilt, F2::IntoFilt>>
-        where Self: Sized,
-              F: IntoFilter<N> + Sized,
-              F2: IntoFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFilter<N> + Sized,
+        F2: IntoFilter<N> + Sized,
     {
         Or::new(self, Or::new(other.into_filter(), other2.into_filter()))
     }
@@ -138,7 +141,8 @@ pub trait Filter<N> {
     /// assert!(c.filter(&4));
     /// ```
     fn nor<F>(self, other: F) -> Not<Or<Self, F>>
-        where Self: Sized,
+    where
+        Self: Sized,
     {
         Not::new(Or::new(self, other))
     }
@@ -159,7 +163,8 @@ pub trait Filter<N> {
     /// assert!(c.filter(&9));
     /// ```
     fn xor<F>(self, other: F) -> XOr<Self, F>
-        where Self: Sized,
+    where
+        Self: Sized,
     {
         XOr::new(self, other)
     }
@@ -180,8 +185,9 @@ pub trait Filter<N> {
     /// assert!(!c.filter(&9));
     /// ```
     fn and<F>(self, other: F) -> And<Self, F::IntoFilt>
-        where Self: Sized,
-              F: IntoFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFilter<N> + Sized,
     {
         And::new(self, other.into_filter())
     }
@@ -205,9 +211,10 @@ pub trait Filter<N> {
     /// assert!(!d.filter(&19));
     /// ```
     fn and3<F, F2>(self, other: F, other2: F2) -> And<Self, And<F::IntoFilt, F2::IntoFilt>>
-        where Self: Sized,
-              F: IntoFilter<N> + Sized,
-              F2: IntoFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFilter<N> + Sized,
+        F2: IntoFilter<N> + Sized,
     {
         And::new(self, And::new(other.into_filter(), other2.into_filter()))
     }
@@ -230,8 +237,9 @@ pub trait Filter<N> {
     /// assert!(c.filter(&29));
     /// ```
     fn and_not<F>(self, other: F) -> And<Self, Not<F::IntoFilt>>
-        where Self: Sized,
-              F: IntoFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFilter<N> + Sized,
     {
         self.and(Not::new(other.into_filter()))
     }
@@ -254,7 +262,8 @@ pub trait Filter<N> {
     /// assert!(c.filter(&29));
     /// ```
     fn nand<F>(self, other: F) -> Not<And<Self, F>>
-        where Self: Sized,
+    where
+        Self: Sized,
     {
         Not::new(And::new(self, other))
     }
@@ -276,9 +285,10 @@ pub trait Filter<N> {
     /// assert!(!c.filter(&9));
     /// ```
     fn map_input<O, B, T, M>(self, map: M) -> MapInput<Self, M, O, B>
-        where Self: Sized,
-              M: Fn(&T) -> N,
-              B: Borrow<O> + Sized
+    where
+        Self: Sized,
+        M: Fn(&T) -> N,
+        B: Borrow<O> + Sized,
     {
         MapInput::new(self, map)
     }
@@ -291,14 +301,15 @@ pub trait Filter<N> {
     ///
     /// let a = (|&a: &usize| { a > 5 });
     /// let a = a.into_failable();
-    /// 
+    ///
     /// assert_eq!(a.filter(&3), Ok(false));
     /// assert_eq!(a.filter(&5), Ok(false));
     /// assert_eq!(a.filter(&7), Ok(true));
     /// assert_eq!(a.filter(&9), Ok(true));
     /// ```
     fn into_failable(self) -> IntoFailable<Self>
-        where Self: Sized
+    where
+        Self: Sized,
     {
         IntoFailable::new(self)
     }
@@ -312,93 +323,95 @@ macro_rules! make_filter {
                 $expression(self, element)
             }
         }
-    }
+    };
 }
-
 
 #[cfg(test)]
 mod test {
-    use filter::Filter;
-    use ops::and::And;
-    use ops::bool::Bool;
+    use crate::filter::Filter;
+    use crate::ops::and::And;
+    use crate::ops::bool::Bool;
 
     #[test]
     fn closures() {
-        let a = (|&a: &usize|{ a < 3 }).and(|&a: &usize| a > 1);
+        let a = (|&a: &usize| a < 3).and(|&a: &usize| a > 1);
 
-        assert_eq!(a.filter(&0), false);
-        assert_eq!(a.filter(&2), true);
-        assert_eq!(a.filter(&3), false);
+        assert!(!a.filter(&0));
+        assert!(a.filter(&2));
+        assert!(!a.filter(&3));
     }
 
     #[test]
     fn and_filter() {
         let a = And::new(|&a: &usize| a > 0, |&a: &usize| a == 3);
 
-        assert_eq!(a.filter(&3),  true);
-        assert_eq!(a.filter(&5),  false);
-        assert_eq!(a.filter(&0), false);
+        assert!(a.filter(&3));
+        assert!(!a.filter(&5));
+        assert!(!a.filter(&0));
     }
 
     #[test]
     fn xor_filter() {
         let a = (|&a: &usize| a == 0).xor(|&a: &usize| a == 3);
 
-        assert_eq!(a.filter(&3), true);
-        assert_eq!(a.filter(&5), false);
-        assert_eq!(a.filter(&0), true);
+        assert!(a.filter(&3));
+        assert!(!a.filter(&5));
+        assert!(a.filter(&0));
     }
 
     #[test]
     fn complex_filter() {
-        let a = (|&a: &usize|{ a > 5 }).and_not(|&a: &usize| a < 20).or(|&a: &usize| a == 10);
+        let a = (|&a: &usize| a > 5)
+            .and_not(|&a: &usize| a < 20)
+            .or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20) ) || a == 10
 
-        assert_eq!(a.filter(&21), true);
-        assert_eq!(a.filter(&10), true);
-        assert_eq!(a.filter(&11), false);
-        assert_eq!(a.filter(&5), false);
+        assert!(a.filter(&21));
+        assert!(a.filter(&10));
+        assert!(!a.filter(&11));
+        assert!(!a.filter(&5));
     }
 
     #[test]
     fn complex_filter_closured() {
-        let a = (|&a: &usize| (|&a: &usize|{ a > 5 }).and_not(|&a: &usize| a < 20).filter(&a)).or(|&a: &usize| a == 10);
+        let a = (|&a: &usize| (|&a: &usize| a > 5).and_not(|&a: &usize| a < 20).filter(&a))
+            .or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20)) || a == 10
 
-        assert_eq!(a.filter(&21), true);
-        assert_eq!(a.filter(&10), true);
-        assert_eq!(a.filter(&11), false);
-        assert_eq!(a.filter(&5), false);
+        assert!(a.filter(&21));
+        assert!(a.filter(&10));
+        assert!(!a.filter(&11));
+        assert!(!a.filter(&5));
     }
 
     #[test]
     fn complex_filter_named_closures() {
-        let not_eq_to_one   = |&a: &usize| { a != 1 };
-        let not_eq_to_two   = |&a: &usize| { a != 2 };
-        let not_eq_to_three = |&a: &usize| { a != 3 };
+        let not_eq_to_one = |&a: &usize| a != 1;
+        let not_eq_to_two = |&a: &usize| a != 2;
+        let not_eq_to_three = |&a: &usize| a != 3;
 
         let a = not_eq_to_one.and(not_eq_to_two).and(not_eq_to_three);
         // We now have ((a > 5) && !(a < 20)) || a == 10
 
-        assert_eq!(a.filter(&21), true);
-        assert_eq!(a.filter(&10), true);
-        assert_eq!(a.filter(&1), false);
-        assert_eq!(a.filter(&3), false);
+        assert!(a.filter(&21));
+        assert!(a.filter(&10));
+        assert!(!a.filter(&1));
+        assert!(!a.filter(&3));
     }
 
     #[test]
     fn filter_with_bool() {
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.and(Bool::new(true)).filter(&0), false);
+        let eq = |&a: &usize| a == 1;
+        assert!(!eq.and(Bool::new(true)).filter(&0));
 
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.and(Bool::new(true)).filter(&1), true);
+        let eq = |&a: &usize| a == 1;
+        assert!(eq.and(Bool::new(true)).filter(&1));
 
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.xor(Bool::new(true)).filter(&1), false);
+        let eq = |&a: &usize| a == 1;
+        assert!(!eq.xor(Bool::new(true)).filter(&1));
 
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.or(Bool::new(true)).filter(&42), true);
+        let eq = |&a: &usize| a == 1;
+        assert!(eq.or(Bool::new(true)).filter(&42));
     }
 
     struct EqTo {
@@ -414,29 +427,31 @@ mod test {
     #[test]
     fn filter_with_eqto() {
         let eq = EqTo { i: 0 };
-        assert_eq!(eq.filter(&0),  true);
-        assert_eq!(eq.filter(&1),  false);
-        assert_eq!(eq.filter(&17), false);
-        assert_eq!(eq.filter(&42), false);
+        assert!(eq.filter(&0));
+        assert!(!eq.filter(&1));
+        assert!(!eq.filter(&17));
+        assert!(!eq.filter(&42));
     }
 
     #[test]
     fn filter_with_combined_eqto() {
         let aeq = EqTo { i: 1 }.not().and_not(EqTo { i: 17 });
 
-        assert_eq!(aeq.filter(&0),  true);
-        assert_eq!(aeq.filter(&1),  false);
-        assert_eq!(aeq.filter(&2),  true);
-        assert_eq!(aeq.filter(&17), false);
+        assert!(aeq.filter(&0));
+        assert!(!aeq.filter(&1));
+        assert!(aeq.filter(&2));
+        assert!(!aeq.filter(&17));
     }
 
     #[test]
     fn filter_iterator() {
-        let v = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        let v = vec![
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        ];
 
-        let inrange        = (|&a: &usize| { a > 5 }).and(|&a: &usize| { a < 15 });
+        let inrange = (|&a: &usize| a > 5).and(|&a: &usize| a < 15);
 
-        let r : Vec<usize> = v.into_iter().filter(|x| inrange.filter(x)).collect();
+        let r: Vec<usize> = v.into_iter().filter(|x| inrange.filter(x)).collect();
 
         assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
     }
@@ -449,13 +464,12 @@ mod test {
         };
 
         let lt = LowerThan(10);
-        assert_eq!(lt.filter(&0),  true);
-        assert_eq!(lt.filter(&1),  true);
-        assert_eq!(lt.filter(&17), false);
-        assert_eq!(lt.filter(&42), false);
+        assert!(lt.filter(&0));
+        assert!(lt.filter(&1));
+        assert!(!lt.filter(&17));
+        assert!(!lt.filter(&42));
     }
 }
-
 
 #[cfg(test)]
 #[cfg(feature = "unstable-filter-as-fn")]
@@ -465,55 +479,58 @@ mod test_unstable {
 
     #[test]
     fn closures() {
-        let a = (|&a: &usize|{ a < 3 }).and(|&a: &usize| a > 1);
+        let a = (|&a: &usize| a < 3).and(|&a: &usize| a > 1);
 
-        assert_eq!(a(&0), false);
-        assert_eq!(a(&2), true);
-        assert_eq!(a(&3), false);
+        assert!(!a(&0));
+        assert!(a(&2));
+        assert!(!a(&3));
     }
 
     #[test]
     fn xor_filter() {
         let a = (|&a: &usize| a == 0).xor(|&a: &usize| a == 3);
 
-        assert_eq!(a(&3), true);
-        assert_eq!(a(&5), false);
-        assert_eq!(a(&0), true);
+        assert!(a(&3));
+        assert!(!a(&5));
+        assert!(a(&0));
     }
 
     #[test]
     fn complex_filter() {
-        let a = (|&a: &usize|{ a > 5 }).and_not(|&a: &usize| a < 20).or(|&a: &usize| a == 10);
+        let a = (|&a: &usize| a > 5)
+            .and_not(|&a: &usize| a < 20)
+            .or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20) ) || a == 10
 
-        assert_eq!(a(&21), true);
-        assert_eq!(a(&11), false);
+        assert!(a(&21));
+        assert!(!a(&11));
     }
 
     #[test]
     fn filter_with_bool() {
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.and(Bool::new(true))(&0), false);
+        let eq = |&a: &usize| a == 1;
+        assert!(!eq.and(Bool::new(true))(&0));
 
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.and(Bool::new(true))(&1), true);
+        let eq = |&a: &usize| a == 1;
+        assert!(eq.and(Bool::new(true))(&1));
 
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.xor(Bool::new(true))(&1), false);
+        let eq = |&a: &usize| a == 1;
+        assert!(!eq.xor(Bool::new(true))(&1));
 
-        let eq = |&a: &usize| { a == 1 };
-        assert_eq!(eq.or(Bool::new(true))(&42), true);
+        let eq = |&a: &usize| a == 1;
+        assert!(eq.or(Bool::new(true))(&42));
     }
 
     #[test]
     fn filter_iterator() {
-        let v = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        let v = vec![
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        ];
 
-        let inrange        = (|&a: &usize| { a > 5 }).and(|&a: &usize| { a < 15 });
+        let inrange = (|&a: &usize| a > 5).and(|&a: &usize| a < 15);
 
-        let r : Vec<usize> = v.into_iter().filter(inrange).collect();
+        let r: Vec<usize> = v.into_iter().filter(inrange).collect();
 
         assert_eq!(r, vec![6, 7, 8, 9, 10, 11, 12, 13, 14]);
     }
 }
-
