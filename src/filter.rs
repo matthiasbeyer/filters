@@ -42,7 +42,7 @@ impl<I, T: Fn(&I) -> bool> Filter<I> for T {
 /// The filter trait
 pub trait Filter<N> {
     /// The function which is used to filter something
-    fn filter(&self, &N) -> bool;
+    fn filter(&self, _: &N) -> bool;
 
     /// Helper to invert a filter.
     ///

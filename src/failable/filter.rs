@@ -33,7 +33,7 @@ pub trait FailableFilter<N> {
     type Error: Sized;
 
     /// The function which is used to filter something
-    fn filter(&self, &N) -> Result<bool, Self::Error>;
+    fn filter(&self, _: &N) -> Result<bool, Self::Error>;
 
     /// Helper to invert a filter.
     ///

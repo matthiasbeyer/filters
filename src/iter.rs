@@ -75,7 +75,7 @@ where
     I: Iterator<Item = Result<T, E>>,
     F: Filter<T>,
 {
-    fn filter_oks(self, F) -> FilterOksIter<T, E, I, F>;
+    fn filter_oks(self, _: F) -> FilterOksIter<T, E, I, F>;
 }
 
 impl<T, E, I, F> FilterOks<T, E, I, F> for I
@@ -121,7 +121,7 @@ where
     I: Iterator<Item = Result<T, E>>,
     F: Filter<E>,
 {
-    fn filter_errs(self, F) -> FilterErrIter<T, E, I, F>;
+    fn filter_errs(self, _: F) -> FilterErrIter<T, E, I, F>;
 }
 
 impl<T, E, I, F> FilterErr<T, E, I, F> for I
