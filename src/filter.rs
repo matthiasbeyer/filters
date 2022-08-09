@@ -336,27 +336,27 @@ mod test {
     fn closures() {
         let a = (|&a: &usize| a < 3).and(|&a: &usize| a > 1);
 
-        assert_eq!(a.filter(&0), false);
-        assert_eq!(a.filter(&2), true);
-        assert_eq!(a.filter(&3), false);
+        assert!(!a.filter(&0));
+        assert!(a.filter(&2));
+        assert!(!a.filter(&3));
     }
 
     #[test]
     fn and_filter() {
         let a = And::new(|&a: &usize| a > 0, |&a: &usize| a == 3);
 
-        assert_eq!(a.filter(&3), true);
-        assert_eq!(a.filter(&5), false);
-        assert_eq!(a.filter(&0), false);
+        assert!(a.filter(&3));
+        assert!(!a.filter(&5));
+        assert!(!a.filter(&0));
     }
 
     #[test]
     fn xor_filter() {
         let a = (|&a: &usize| a == 0).xor(|&a: &usize| a == 3);
 
-        assert_eq!(a.filter(&3), true);
-        assert_eq!(a.filter(&5), false);
-        assert_eq!(a.filter(&0), true);
+        assert!(a.filter(&3));
+        assert!(!a.filter(&5));
+        assert!(a.filter(&0));
     }
 
     #[test]
@@ -366,10 +366,10 @@ mod test {
             .or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20) ) || a == 10
 
-        assert_eq!(a.filter(&21), true);
-        assert_eq!(a.filter(&10), true);
-        assert_eq!(a.filter(&11), false);
-        assert_eq!(a.filter(&5), false);
+        assert!(a.filter(&21));
+        assert!(a.filter(&10));
+        assert!(!a.filter(&11));
+        assert!(!a.filter(&5));
     }
 
     #[test]
@@ -378,10 +378,10 @@ mod test {
             .or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20)) || a == 10
 
-        assert_eq!(a.filter(&21), true);
-        assert_eq!(a.filter(&10), true);
-        assert_eq!(a.filter(&11), false);
-        assert_eq!(a.filter(&5), false);
+        assert!(a.filter(&21));
+        assert!(a.filter(&10));
+        assert!(!a.filter(&11));
+        assert!(!a.filter(&5));
     }
 
     #[test]
@@ -393,25 +393,25 @@ mod test {
         let a = not_eq_to_one.and(not_eq_to_two).and(not_eq_to_three);
         // We now have ((a > 5) && !(a < 20)) || a == 10
 
-        assert_eq!(a.filter(&21), true);
-        assert_eq!(a.filter(&10), true);
-        assert_eq!(a.filter(&1), false);
-        assert_eq!(a.filter(&3), false);
+        assert!(a.filter(&21));
+        assert!(a.filter(&10));
+        assert!(!a.filter(&1));
+        assert!(!a.filter(&3));
     }
 
     #[test]
     fn filter_with_bool() {
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.and(Bool::new(true)).filter(&0), false);
+        assert!(!eq.and(Bool::new(true)).filter(&0));
 
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.and(Bool::new(true)).filter(&1), true);
+        assert!(eq.and(Bool::new(true)).filter(&1));
 
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.xor(Bool::new(true)).filter(&1), false);
+        assert!(!eq.xor(Bool::new(true)).filter(&1));
 
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.or(Bool::new(true)).filter(&42), true);
+        assert!(eq.or(Bool::new(true)).filter(&42));
     }
 
     struct EqTo {
@@ -427,20 +427,20 @@ mod test {
     #[test]
     fn filter_with_eqto() {
         let eq = EqTo { i: 0 };
-        assert_eq!(eq.filter(&0), true);
-        assert_eq!(eq.filter(&1), false);
-        assert_eq!(eq.filter(&17), false);
-        assert_eq!(eq.filter(&42), false);
+        assert!(eq.filter(&0));
+        assert!(!eq.filter(&1));
+        assert!(!eq.filter(&17));
+        assert!(!eq.filter(&42));
     }
 
     #[test]
     fn filter_with_combined_eqto() {
         let aeq = EqTo { i: 1 }.not().and_not(EqTo { i: 17 });
 
-        assert_eq!(aeq.filter(&0), true);
-        assert_eq!(aeq.filter(&1), false);
-        assert_eq!(aeq.filter(&2), true);
-        assert_eq!(aeq.filter(&17), false);
+        assert!(aeq.filter(&0));
+        assert!(!aeq.filter(&1));
+        assert!(aeq.filter(&2));
+        assert!(!aeq.filter(&17));
     }
 
     #[test]
@@ -464,10 +464,10 @@ mod test {
         };
 
         let lt = LowerThan(10);
-        assert_eq!(lt.filter(&0), true);
-        assert_eq!(lt.filter(&1), true);
-        assert_eq!(lt.filter(&17), false);
-        assert_eq!(lt.filter(&42), false);
+        assert!(lt.filter(&0));
+        assert!(lt.filter(&1));
+        assert!(!lt.filter(&17));
+        assert!(!lt.filter(&42));
     }
 }
 
@@ -481,18 +481,18 @@ mod test_unstable {
     fn closures() {
         let a = (|&a: &usize| a < 3).and(|&a: &usize| a > 1);
 
-        assert_eq!(a(&0), false);
-        assert_eq!(a(&2), true);
-        assert_eq!(a(&3), false);
+        assert!(!a(&0));
+        assert!(a(&2));
+        assert!(!a(&3));
     }
 
     #[test]
     fn xor_filter() {
         let a = (|&a: &usize| a == 0).xor(|&a: &usize| a == 3);
 
-        assert_eq!(a(&3), true);
-        assert_eq!(a(&5), false);
-        assert_eq!(a(&0), true);
+        assert!(a(&3));
+        assert!(!a(&5));
+        assert!(a(&0));
     }
 
     #[test]
@@ -502,23 +502,23 @@ mod test_unstable {
             .or(|&a: &usize| a == 10);
         // We now have ((a > 5) && !(a < 20) ) || a == 10
 
-        assert_eq!(a(&21), true);
-        assert_eq!(a(&11), false);
+        assert!(a(&21));
+        assert!(!a(&11));
     }
 
     #[test]
     fn filter_with_bool() {
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.and(Bool::new(true))(&0), false);
+        assert!(!eq.and(Bool::new(true))(&0));
 
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.and(Bool::new(true))(&1), true);
+        assert!(eq.and(Bool::new(true))(&1));
 
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.xor(Bool::new(true))(&1), false);
+        assert!(!eq.xor(Bool::new(true))(&1));
 
         let eq = |&a: &usize| a == 1;
-        assert_eq!(eq.or(Bool::new(true))(&42), true);
+        assert!(eq.or(Bool::new(true))(&42));
     }
 
     #[test]
