@@ -12,7 +12,7 @@
 use std::borrow::Borrow;
 use std::marker::PhantomData;
 
-use filter::Filter;
+use crate::filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]

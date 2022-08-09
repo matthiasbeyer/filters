@@ -10,8 +10,8 @@
 //! shouldn't be necessary.
 //!
 
-use failable::filter::FailableFilter;
-use filter::Filter;
+use crate::failable::filter::FailableFilter;
+use crate::filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]

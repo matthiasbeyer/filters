@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-use filter::Filter;
+use crate::filter::Filter;
 
 pub struct FilteredIterator<T, F, I>(F, I)
 where

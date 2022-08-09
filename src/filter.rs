@@ -8,13 +8,13 @@
 //!
 use std::borrow::Borrow;
 
-pub use ops::and::And;
-pub use ops::bool::Bool;
-pub use ops::failable::{AsFailable, IntoFailable};
-pub use ops::map::MapInput;
-pub use ops::not::Not;
-pub use ops::or::Or;
-pub use ops::xor::XOr;
+pub use crate::ops::and::And;
+pub use crate::ops::bool::Bool;
+pub use crate::ops::failable::{AsFailable, IntoFailable};
+pub use crate::ops::map::MapInput;
+pub use crate::ops::not::Not;
+pub use crate::ops::or::Or;
+pub use crate::ops::xor::XOr;
 
 /// Trait for converting something into a Filter
 pub trait IntoFilter<N> {
@@ -328,9 +328,9 @@ macro_rules! make_filter {
 
 #[cfg(test)]
 mod test {
-    use filter::Filter;
-    use ops::and::And;
-    use ops::bool::Bool;
+    use crate::filter::Filter;
+    use crate::ops::and::And;
+    use crate::ops::bool::Bool;
 
     #[test]
     fn closures() {

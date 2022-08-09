@@ -12,7 +12,7 @@
 use std::borrow::Borrow;
 use std::marker::PhantomData;
 
-use failable::filter::FailableFilter;
+use crate::failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]

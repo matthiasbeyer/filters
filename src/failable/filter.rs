@@ -6,12 +6,12 @@
 
 use std::borrow::Borrow;
 
-pub use failable::ops::and::FailableAnd;
-pub use failable::ops::bool::FailableBool;
-pub use failable::ops::map::{FailableMapErr, FailableMapInput};
-pub use failable::ops::not::FailableNot;
-pub use failable::ops::or::FailableOr;
-pub use failable::ops::xor::FailableXOr;
+pub use crate::failable::ops::and::FailableAnd;
+pub use crate::failable::ops::bool::FailableBool;
+pub use crate::failable::ops::map::{FailableMapErr, FailableMapInput};
+pub use crate::failable::ops::not::FailableNot;
+pub use crate::failable::ops::or::FailableOr;
+pub use crate::failable::ops::xor::FailableXOr;
 
 /// Trait for converting something into a Filter
 pub trait IntoFailableFilter<N> {
@@ -419,7 +419,7 @@ mod tests {
 
     #[test]
     fn test_both_filter_types() {
-        use filter::Filter;
+        use crate::filter::Filter;
 
         let a = |_: &i32| -> Result<bool, StupError> { Ok(true) };
         let b = |_: &i32| -> bool { true };
@@ -436,8 +436,8 @@ mod tests {
 
     #[test]
     fn test_both_filter_types_in_one_scope() {
-        use failable::filter::FailableFilter;
-        use filter::Filter;
+        use crate::failable::filter::FailableFilter;
+        use crate::filter::Filter;
 
         let failable = |_: &i32| -> Result<bool, StupError> { Ok(true) };
         let unfailable = |_: &i32| -> bool { true };
