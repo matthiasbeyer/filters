@@ -9,10 +9,10 @@
 //! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
-use std::marker::PhantomData;
 use std::borrow::Borrow;
+use std::marker::PhantomData;
 
-use filter::Filter;
+use crate::filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
@@ -25,9 +25,10 @@ impl<F, M, FT, B> MapInput<F, M, FT, B> {
 }
 
 impl<FT, F, T, B, M> Filter<T> for MapInput<F, M, FT, B>
-    where F: Filter<FT>,
-          B: Borrow<FT> + Sized,
-          M: Fn(&T) -> B
+where
+    F: Filter<FT>,
+    B: Borrow<FT> + Sized,
+    M: Fn(&T) -> B,
 {
     fn filter(&self, e: &T) -> bool {
         self.0.filter(self.1(e).borrow())

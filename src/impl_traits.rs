@@ -103,4 +103,3 @@ macro_rules! impl_failable_operators {
         impl_operators!($struct_ident, $self_var $arg_var $filter_impl, );
     };
 }
-

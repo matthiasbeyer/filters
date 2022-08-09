@@ -10,8 +10,8 @@
 //! shouldn't be necessary.
 //!
 
-use filter::Filter;
-use failable::filter::FailableFilter;
+use crate::failable::filter::FailableFilter;
+use crate::filter::Filter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
@@ -24,7 +24,8 @@ impl<F> IntoFailable<F> {
 }
 
 impl<F, N> FailableFilter<N> for IntoFailable<F>
-    where F: Filter<N>,
+where
+    F: Filter<N>,
 {
     type Error = ();
 
@@ -44,7 +45,8 @@ impl<'a, F: 'a + ?Sized> AsFailable<'a, F> {
 }
 
 impl<'a, F, N> FailableFilter<N> for AsFailable<'a, F>
-    where F: Filter<N> + 'a + ?Sized,
+where
+    F: Filter<N> + 'a + ?Sized,
 {
     type Error = ();
 

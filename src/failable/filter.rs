@@ -6,12 +6,12 @@
 
 use std::borrow::Borrow;
 
-pub use failable::ops::and::FailableAnd;
-pub use failable::ops::bool::FailableBool;
-pub use failable::ops::not::FailableNot;
-pub use failable::ops::xor::FailableXOr;
-pub use failable::ops::or::FailableOr;
-pub use failable::ops::map::{FailableMapInput, FailableMapErr};
+pub use crate::failable::ops::and::FailableAnd;
+pub use crate::failable::ops::bool::FailableBool;
+pub use crate::failable::ops::map::{FailableMapErr, FailableMapInput};
+pub use crate::failable::ops::not::FailableNot;
+pub use crate::failable::ops::or::FailableOr;
+pub use crate::failable::ops::xor::FailableXOr;
 
 /// Trait for converting something into a Filter
 pub trait IntoFailableFilter<N> {
@@ -33,7 +33,7 @@ pub trait FailableFilter<N> {
     type Error: Sized;
 
     /// The function which is used to filter something
-    fn filter(&self, &N) -> Result<bool, Self::Error>;
+    fn filter(&self, _: &N) -> Result<bool, Self::Error>;
 
     /// Helper to invert a filter.
     ///
@@ -48,7 +48,8 @@ pub trait FailableFilter<N> {
     /// assert!(f.filter(&2).unwrap());
     /// ```
     fn not(self) -> FailableNot<Self>
-        where Self: Sized
+    where
+        Self: Sized,
     {
         FailableNot::new(self)
     }
@@ -70,8 +71,9 @@ pub trait FailableFilter<N> {
     /// assert!(!c.filter(&7).unwrap());
     /// ```
     fn or<F>(self, other: F) -> FailableOr<Self, F::IntoFilt>
-        where Self: Sized,
-              F: IntoFailableFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFailableFilter<N> + Sized,
     {
         FailableOr::new(self, other.into_failable_filter())
     }
@@ -93,8 +95,9 @@ pub trait FailableFilter<N> {
     /// assert!(c.filter(&7).unwrap());
     /// ```
     fn or_not<F>(self, other: F) -> FailableOr<Self, FailableNot<F::IntoFilt>>
-        where Self: Sized,
-              F: IntoFailableFilter<N> + Sized,
+    where
+        Self: Sized,
+        F: IntoFailableFilter<N> + Sized,
     {
         self.or(FailableNot::new(other.into_failable_filter()))
     }
@@ -117,12 +120,20 @@ pub trait FailableFilter<N> {
     /// assert!(d.filter(&3).unwrap());
     /// assert!(!d.filter(&4).unwrap());
     /// ```
-    fn or3<F, F2>(self, other: F, other2: F2) -> FailableOr<Self, FailableOr<F::IntoFilt, F2::IntoFilt>>
-        where Self: Sized,
-              F: IntoFailableFilter<N> + Sized,
-              F2: IntoFailableFilter<N> + Sized
+    fn or3<F, F2>(
+        self,
+        other: F,
+        other2: F2,
+    ) -> FailableOr<Self, FailableOr<F::IntoFilt, F2::IntoFilt>>
+    where
+        Self: Sized,
+        F: IntoFailableFilter<N> + Sized,
+        F2: IntoFailableFilter<N> + Sized,
     {
-        FailableOr::new(self, FailableOr::new(other.into_failable_filter(), other2.into_failable_filter()))
+        FailableOr::new(
+            self,
+            FailableOr::new(other.into_failable_filter(), other2.into_failable_filter()),
+        )
     }
 
     /// Helper to connect two filters via logical NOR
@@ -143,7 +154,8 @@ pub trait FailableFilter<N> {
     /// assert!(c.filter(&4).unwrap());
     /// ```
     fn nor<F>(self, other: F) -> FailableNot<FailableOr<Self, F>>
-        where Self: Sized,
+    where
+        Self: Sized,
     {
         FailableNot::new(FailableOr::new(self, other))
     }
@@ -167,7 +179,8 @@ pub trait FailableFilter<N> {
     /// assert!(c.filter(&9).unwrap());
     /// ```
     fn xor<F>(self, other: F) -> FailableXOr<Self, F>
-        where Self: Sized,
+    where
+        Self: Sized,
     {
         FailableXOr::new(self, other)
     }
@@ -191,8 +204,9 @@ pub trait FailableFilter<N> {
     /// assert!(!c.filter(&9).unwrap());
     /// ```
     fn and<F>(self, other: F) -> FailableAnd<Self, F::IntoFilt>
-        where Self: Sized,
-              F: IntoFailableFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFailableFilter<N> + Sized,
     {
         FailableAnd::new(self, other.into_failable_filter())
     }
@@ -218,12 +232,20 @@ pub trait FailableFilter<N> {
     /// assert!(!d.filter(&15).unwrap());
     /// assert!(!d.filter(&19).unwrap());
     /// ```
-    fn and3<F, F2>(self, other: F, other2: F2) -> FailableAnd<Self, FailableAnd<F::IntoFilt, F2::IntoFilt>>
-        where Self: Sized,
-              F: IntoFailableFilter<N> + Sized,
-              F2: IntoFailableFilter<N> + Sized
+    fn and3<F, F2>(
+        self,
+        other: F,
+        other2: F2,
+    ) -> FailableAnd<Self, FailableAnd<F::IntoFilt, F2::IntoFilt>>
+    where
+        Self: Sized,
+        F: IntoFailableFilter<N> + Sized,
+        F2: IntoFailableFilter<N> + Sized,
     {
-        FailableAnd::new(self, FailableAnd::new(other.into_failable_filter(), other2.into_failable_filter()))
+        FailableAnd::new(
+            self,
+            FailableAnd::new(other.into_failable_filter(), other2.into_failable_filter()),
+        )
     }
 
     /// Helper to connect two filters via logical AND and NOT
@@ -247,8 +269,9 @@ pub trait FailableFilter<N> {
     /// assert!(c.filter(&29).unwrap());
     /// ```
     fn and_not<F>(self, other: F) -> FailableAnd<Self, FailableNot<F::IntoFilt>>
-        where Self: Sized,
-              F: IntoFailableFilter<N> + Sized
+    where
+        Self: Sized,
+        F: IntoFailableFilter<N> + Sized,
     {
         self.and(FailableNot::new(other.into_failable_filter()))
     }
@@ -274,7 +297,8 @@ pub trait FailableFilter<N> {
     /// assert!(c.filter(&29).unwrap());
     /// ```
     fn nand<F>(self, other: F) -> FailableNot<FailableAnd<Self, F>>
-        where Self: Sized,
+    where
+        Self: Sized,
     {
         FailableNot::new(FailableAnd::new(self, other))
     }
@@ -299,9 +323,10 @@ pub trait FailableFilter<N> {
     /// assert!(!c.filter(&9).unwrap());
     /// ```
     fn map_input<O, B, T, M>(self, map: M) -> FailableMapInput<Self, M, O, B>
-        where Self: Sized,
-              M: Fn(&T) -> N,
-              B: Borrow<O> + Sized
+    where
+        Self: Sized,
+        M: Fn(&T) -> N,
+        B: Borrow<O> + Sized,
     {
         FailableMapInput::new(self, map)
     }
@@ -327,17 +352,18 @@ pub trait FailableFilter<N> {
     /// assert!(!c.filter(&9).unwrap());
     /// ```
     fn map_err<M, OE>(self, map: M) -> FailableMapErr<Self, M, OE>
-        where Self: Sized,
-              M: Fn(Self::Error) -> OE
+    where
+        Self: Sized,
+        M: Fn(Self::Error) -> OE,
     {
         FailableMapErr::new(self, map)
     }
-
 }
 
 /// All closures that take a ref to something and return Result<bool, E> are failable filters
 impl<I, E, T> FailableFilter<I> for T
-    where T: Fn(&I) -> Result<bool, E>
+where
+    T: Fn(&I) -> Result<bool, E>,
 {
     type Error = E;
 
@@ -351,7 +377,7 @@ mod tests {
     use super::*;
 
     #[derive(Debug)]
-    struct StupError { }
+    struct StupError {}
 
     #[test]
     fn compile_test() {
@@ -393,33 +419,30 @@ mod tests {
 
     #[test]
     fn test_both_filter_types() {
-        use filter::Filter;
+        use crate::filter::Filter;
 
         let a = |_: &i32| -> Result<bool, StupError> { Ok(true) };
         let b = |_: &i32| -> bool { true };
         let c = |_: &i32| -> Result<bool, StupError> { Ok(true) };
         let d = |_: &i32| -> bool { false };
 
-        let e = a                                               // true
-            .and(b.into_failable().map_err(|_| StupError {}))   // true
-            .xor(c)                                             // true
-            .or(d.into_failable().map_err(|_| StupError {}));   // true
+        let e = a // true
+            .and(b.into_failable().map_err(|_| StupError {})) // true
+            .xor(c) // true
+            .or(d.into_failable().map_err(|_| StupError {})); // true
 
         assert!(!e.filter(&1).unwrap());
     }
 
-
     #[test]
     fn test_both_filter_types_in_one_scope() {
-        use filter::Filter;
-        use failable::filter::FailableFilter;
+        use crate::failable::filter::FailableFilter;
+        use crate::filter::Filter;
 
-        let failable   = |_: &i32| -> Result<bool, StupError> { Ok(true) };
+        let failable = |_: &i32| -> Result<bool, StupError> { Ok(true) };
         let unfailable = |_: &i32| -> bool { true };
 
         assert!(failable.filter(&1).unwrap());
         assert!(unfailable.filter(&1));
-
     }
 }
-

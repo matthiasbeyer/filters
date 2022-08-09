@@ -9,10 +9,10 @@
 //! Will be automatically included when including `filter::Filter`, so importing this module
 //! shouldn't be necessary.
 //!
-use std::marker::PhantomData;
 use std::borrow::Borrow;
+use std::marker::PhantomData;
 
-use failable::filter::FailableFilter;
+use crate::failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
@@ -25,9 +25,10 @@ impl<F, M, FT, B> FailableMapInput<F, M, FT, B> {
 }
 
 impl<FT, F, T, B, M> FailableFilter<T> for FailableMapInput<F, M, FT, B>
-    where F: FailableFilter<FT>,
-          B: Borrow<FT> + Sized,
-          M: Fn(&T) -> B
+where
+    F: FailableFilter<FT>,
+    B: Borrow<FT> + Sized,
+    M: Fn(&T) -> B,
 {
     type Error = F::Error;
 
@@ -47,8 +48,9 @@ impl<F, M, E> FailableMapErr<F, M, E> {
 }
 
 impl<E, F, T, M> FailableFilter<T> for FailableMapErr<F, M, E>
-    where F: FailableFilter<T>,
-          M: Fn(F::Error) -> E
+where
+    F: FailableFilter<T>,
+    M: Fn(F::Error) -> E,
 {
     type Error = E;
 

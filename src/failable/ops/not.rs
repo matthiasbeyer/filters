@@ -10,22 +10,21 @@
 //! shouldn't be necessary.
 //!
 
-use failable::filter::FailableFilter;
+use crate::failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
 pub struct FailableNot<T>(T);
 
 impl<T> FailableNot<T> {
-
     pub fn new(a: T) -> FailableNot<T> {
         FailableNot(a)
     }
-
 }
 
 impl<N, T> FailableFilter<N> for FailableNot<T>
-    where T: FailableFilter<N>
+where
+    T: FailableFilter<N>,
 {
     type Error = T::Error;
 

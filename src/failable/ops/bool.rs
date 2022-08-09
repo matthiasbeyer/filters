@@ -10,26 +10,22 @@
 //! shouldn't be necessary.
 //!
 
-use failable::filter::FailableFilter;
+use crate::failable::filter::FailableFilter;
 
 #[must_use = "filters are lazy and do nothing unless consumed"]
 #[derive(Clone)]
 pub struct FailableBool(bool);
 
 impl FailableBool {
-
     pub fn new(b: bool) -> FailableBool {
         FailableBool(b)
     }
-
 }
 
 impl From<bool> for FailableBool {
-
     fn from(b: bool) -> FailableBool {
         FailableBool::new(b)
     }
-
 }
 
 impl<N> FailableFilter<N> for FailableBool {
@@ -39,4 +35,3 @@ impl<N> FailableFilter<N> for FailableBool {
         Ok(self.0)
     }
 }
-
